@@ -1,3 +1,5 @@
+from brain import Brain
+
 class DNA(object):
     def __init__(self):
         self._color_gene        = 0x00
@@ -29,7 +31,7 @@ class Organism(object):
         self._energy_bar  = None   # some value. this is energy that the organism uses to move and attack and defend
         self._energy_body = None   # energetic value of the organism. Should also be determined based on mass or actual body parameters
         self._dna         = None   # Still not sure how this will be represented
-        self._brain       = None   # This will most likely be the neural network controlling the organism
+        self._brain       = Brain()   # This will most likely be the neural network controlling the organism
     
         #----Place in the world
         self._xpos        = 0
@@ -53,16 +55,58 @@ class Organism(object):
     def mass(self):
         return self._mass
 
+    #-------------
+    @property
+    def fitness(self):
+        return self._fitness
+
+    @fitness.setter
+    def fitness(self,new_val):
+        if new_val < 0:
+            self._fitness = 0
+        else:
+            self._fitness = new_val
+
     #========================================
-    def check_species_compatibility(self,other_dna):
+    def check_species_compatibility(self, other_dna):
         '''Name could be improved. Check if this species is 
         compatible with `other_dna` species to determine if 
         they belong to the same species'''
         pass
 
+    def compute_fitness(self):
+        pass 
+
+    #=======================================
+    def __lt__(self,other_org):
+        return self.fitness < other_org.fitness
+
+    def __eq__(self, other_org):
+        return self.fitness == other_org.fitness   #I'm not sure about this one. I might want to use equality to check if the genome is the same
     
 class SimpleOrganism(object):
     def __init__(self):
-        self.genes = ['area', 'num_sides', 'color_r', 
-                      'color_g', 'color_b', 'max_energy',
-                      'max_step']
+        # self.genes = ['area', 'num_sides', 'color_r', 
+        #               'color_g', 'color_b', 'max_energy',
+        #               'max_step']
+        self.genes = {
+            'area'       : 5,
+            'num_sides'  : 6,
+            'color_r'    : 200,
+            'color_g'    : 100,
+            'color_b'    : 150,
+            'max_energy' : 50,
+            'max_step'   : 3
+        }
+        
+        self.gene_expressions = [1, 1, 1, 1, 1, 1, 1]    #binary switches for the different genes in the organisms
+
+        self.brain = Brain()
+
+class Plant(SimpleOrganism):
+    def __init__(self):
+        super().__init__()
+        self.genes['max_step'] = 0    #plants don't move, so this is zero
+        self.genes['color_r'] = 20
+        self.genes['color_g'] = 255
+        self.genes['color_b'] = 50

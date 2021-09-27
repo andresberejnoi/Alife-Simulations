@@ -1,12 +1,13 @@
-from main import SIMULATION_PARAMS
-
-
 DEFAULT_WORLD_PARAMS = {
-    'max_population':200,
-    'land_water_ratio':0.7,
-    'day_length':10000,   #number of simulation timesteps or ticks
-    'day_night_ratio': 0.6   #the ratio of day compared to night, from the total day_length
+    'max_population'   : 200,
+    'land_water_ratio' : 0.7,
+    'day_length'       : 10000,   #number of simulation timesteps or ticks
+    'day_night_ratio'  : 0.6,   #the ratio of day compared to night, from the total day_length
+    'map_width'        : 5000,
+    'map_height'       : 5000,
 }
+
+
 class World(object):
     '''Takes some parameters to create a world.
     A world can have different rates of organism spawn
@@ -23,8 +24,8 @@ class World(object):
         num_orgs = self.world_settings['max_population']
 
     def run_simulation(self, simulation_params):
-        num_generations = SIMULATION_PARAMS['generations']
-        num_timesteps   = SIMULATION_PARAMS['timesteps']
+        num_generations = simulation_params['generations']
+        num_timesteps   = simulation_params['timesteps']
 
         for gen in range(num_generations):
 
@@ -35,5 +36,13 @@ class World(object):
 
             # Now a whole generation is over and it is time to perform crossover
             # and mutation to set up the population for the next generation
+
+            #===============COMPUTING FITNESS===================
             for organism in self.population:
                 organism.compute_fitness()
+
+            self.population.sort(reverse=True)    #sort will place lower elements first, so reverse=True will make them high to low
+
+
+            #
+
