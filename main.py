@@ -15,3 +15,5 @@ def main():
     world.init_organisms()
 
     world.run_simulation(SIMULATION_PARAMS)
+
+main()

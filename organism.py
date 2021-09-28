@@ -1,5 +1,8 @@
 from brain import Brain
 
+from math import sin
+from math import cos
+
 class DNA(object):
     def __init__(self):
         self._color_gene        = 0x00
@@ -90,23 +93,167 @@ class SimpleOrganism(object):
         #               'color_g', 'color_b', 'max_energy',
         #               'max_step']
         self.genes = {
-            'area'       : 5,
+            'radius'     : 0.05,
             'num_sides'  : 6,
-            'color_r'    : 200,
-            'color_g'    : 100,
-            'color_b'    : 150,
+            'color_r'    : 200/255,
+            'color_g'    : 50/255,
+            'color_b'    : 50/255,
+            'alpha'      : 1,
             'max_energy' : 50,
-            'max_step'   : 3
+            'max_step'   : 0.4
         }
         
         self.gene_expressions = [1, 1, 1, 1, 1, 1, 1]    #binary switches for the different genes in the organisms
 
         self.brain = Brain()
+        self._direction = 90
+        self.x_pos = 0
+        self.y_pos = 0
+
+    @property
+    def direction(self):
+        return self._direction
+
+    @direction.setter
+    def direction(self, new_angle):
+        '''angles will always remain within [0-360]'''
+        if new_angle > 360:
+            self._direction = new_angle - 360
+        elif new_angle < 0:
+            self._direction = new_angle + 360
+        else:
+            self._direction = new_angle
+
+    def set_position_dir(self, xy_tuple, angle):
+        self.x_pos     = xy_tuple[0]
+        self.y_pos     = xy_tuple[1]
+        self.direction = angle            #this should be the angle of the organism (the direction it is facing)
+
+    def update_coords(self, xy_tuple, angle):
+        self.x_pos     += xy_tuple[0]
+        self.y_pos     += xy_tuple[1]
+        self.direction += angle
+
+    def get_rgb(self):
+        return (self.r_color,
+                self.g_color,
+                self.b_color,)
+
+    def get_rgba(self):
+        return (self.r_color,
+                self.g_color,
+                self.b_color,
+                self.alpha,)
+
+    def set_rgba(self,r,g,b,alpha=1):
+        self.r_color = r 
+        self.g_color = g
+        self.b_color = b 
+        self.alpha   = alpha
+
+    #-----------
+    @property
+    def r_color(self):
+        return self.genes['color_r']
+    
+    @r_color.setter
+    def r_color(self,new_val):
+        if isinstance(new_val,int):
+            if new_val >= 0 and new_val <= 255:
+                self.genes['color_r'] = new_val/255
+            elif new_val < 0:
+                self.genes['color_r'] = 0
+            elif new_val > 255:
+                self.genes['color_r'] = 1
+
+        elif isinstance(new_val,float):
+            if new_val >= 0 and new_val <=1:
+                self.genes['color_r'] = new_val
+            elif new_val < 0:
+                self.genes['color_r'] = 0
+            elif new_val > 1:
+                self.genes['color_r'] = 1
+
+    #-----------
+    @property
+    def g_color(self):
+        return self.genes['color_g']
+    
+    @g_color.setter
+    def g_color(self,new_val):
+        if isinstance(new_val,int):
+            if new_val >= 0 and new_val <= 255:
+                self.genes['color_g'] = new_val/255
+            elif new_val < 0:
+                self.genes['color_g'] = 0
+            elif new_val > 255:
+                self.genes['color_g'] = 1
+
+        elif isinstance(new_val,float):
+            if new_val >= 0 and new_val <=1:
+                self.genes['color_g'] = new_val
+            elif new_val < 0:
+                self.genes['color_g'] = 0
+            elif new_val > 1:
+                self.genes['color_g'] = 1
+    
+    #-----------
+    @property
+    def b_color(self):
+        return self.genes['color_b']
+    
+    @b_color.setter
+    def b_color(self,new_val):
+        if isinstance(new_val,int):
+            if new_val >= 0 and new_val <= 255:
+                self.genes['color_b'] = new_val/255
+            elif new_val < 0:
+                self.genes['color_b'] = 0
+            elif new_val > 255:
+                self.genes['color_b'] = 1
+
+        elif isinstance(new_val,float):
+            if new_val >= 0 and new_val <=1:
+                self.genes['color_b'] = new_val
+            elif new_val < 0:
+                self.genes['color_b'] = 0
+            elif new_val > 1:
+                self.genes['color_b'] = 1
+
+    @property
+    def alpha(self):
+        return self.genes['alpha']
+
+    @alpha.setter 
+    def alpha(self, new_val):
+        if new_val < 0:
+            new_val = 0 
+        elif new_val > 1:
+            new_val = 1
+        
+        self.genes['alpha'] = new_val
+
+    #======================================
+    def move(self,outside_inputs=None):
+        inputs = outside_inputs #+ something else, like internal inputs
+        step_amount, direction = self.brain.make_decision(inputs)
+        total_motion = self.genes['max_step'] * step_amount
+
+        self.direction += direction
+        new_xy_pos = (self.x_pos + total_motion*cos(self.direction), self.y_pos + total_motion*sin(self.direction))
+
+        self.set_position_dir(new_xy_pos, self.direction)
+
+
 
 class Plant(SimpleOrganism):
     def __init__(self):
         super().__init__()
         self.genes['max_step'] = 0    #plants don't move, so this is zero
-        self.genes['color_r'] = 20
-        self.genes['color_g'] = 255
-        self.genes['color_b'] = 50
+        self.set_rgba(20/255, 255/255, 50/255, 1)
+
+class Predator(SimpleOrganism):
+    def __init__(self):
+        super().__init__()
+        self.genes['num_sides'] = 3
+
