@@ -111,7 +111,9 @@ class SimpleOrganism(object):
         self.x_pos = 0
         self.y_pos = 0
 
-        self.energy = self.genes['max_energy']
+        self.energy         = self.genes['max_energy']
+        self._age           = 0
+        self._dist_traveled = 0
 
         self.alive  = True 
 
@@ -125,6 +127,22 @@ class SimpleOrganism(object):
         self.energy -= abs(amount_to_spend)
         if self.energy <= 0:
             self.kill()
+
+    @property
+    def age(self):
+        return self._age
+    
+    @age.setter
+    def age(self, new_val):
+        self._age = abs(new_val)
+
+    @property
+    def dist_traveled(self):
+        return self._dist_traveled
+
+    @dist_traveled.setter
+    def dist_traveled(self, new_val):
+        self._dist_traveled = abs(new_val)
 
     @property
     def direction(self):
@@ -276,6 +294,7 @@ class SimpleOrganism(object):
             self.direction = -self.direction
             
         self.set_position_dir(new_xy_pos, self.direction)
+        self.dist_traveled += total_motion
 
         return total_motion
 

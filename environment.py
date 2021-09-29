@@ -18,6 +18,10 @@ DEFAULT_WORLD_PARAMS = {
     'basic_distance'   : 0.05,    #defined as the amount of distance an organism need to travel to lose 1 point of energy. This is the minimum cost, but the organism's mass and other factors can make it costlier to move 
 }
 
+def fitness_function(**params):
+    E_in  = params['energy_in']
+    E_out = params['energy_out']
+    traveled_dist = params['total_distance']
 
 class World(object):
     '''Takes some parameters to create a world.
@@ -126,8 +130,9 @@ class World(object):
 
                     energy_penalty = dist_traveled / self.basic_distance
                     org.spend_energy(energy_penalty)
+                    org.age += 1
 
-                #========Remove dead organisms
+                #================Remove dead organisms==================#
                 self.population = [org for org in self.population if org.isalive()]
                 if len(self.population) == 0:
                     break
