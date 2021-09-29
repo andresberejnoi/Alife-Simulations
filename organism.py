@@ -1,3 +1,4 @@
+from matplotlib.pyplot import new_figure_manager
 from brain import Brain
 
 from math import sin
@@ -100,7 +101,7 @@ class SimpleOrganism(object):
             'color_b'    : 50/255,
             'alpha'      : 1,
             'max_energy' : 50,
-            'max_step'   : 0.4
+            'max_step'   : 0.1
         }
         
         self.gene_expressions = [1, 1, 1, 1, 1, 1, 1]    #binary switches for the different genes in the organisms
@@ -109,6 +110,21 @@ class SimpleOrganism(object):
         self._direction = 90
         self.x_pos = 0
         self.y_pos = 0
+
+        self.energy = self.genes['max_energy']
+
+        self.alive  = True 
+
+    def isalive(self):
+        return self.alive
+
+    def kill(self):
+        self.alive = False 
+
+    def spend_energy(self, amount_to_spend):
+        self.energy -= abs(amount_to_spend)
+        if self.energy <= 0:
+            self.kill()
 
     @property
     def direction(self):
@@ -234,26 +250,46 @@ class SimpleOrganism(object):
         self.genes['alpha'] = new_val
 
     #======================================
-    def move(self,outside_inputs=None):
+    def move(self,max_xy, min_xy, outside_inputs=None):
+        '''move the organism based on decisions. Returns the amount 
+        of distance traveled'''
         inputs = outside_inputs #+ something else, like internal inputs
         step_amount, direction = self.brain.make_decision(inputs)
         total_motion = self.genes['max_step'] * step_amount
 
         self.direction += direction
-        new_xy_pos = (self.x_pos + total_motion*cos(self.direction), self.y_pos + total_motion*sin(self.direction))
+        new_xy_pos = [self.x_pos + total_motion*cos(self.direction), self.y_pos + total_motion*sin(self.direction)] 
 
+        #checking that max boundaries are respected
+        if new_xy_pos[0] > max_xy[0]:
+            new_xy_pos[0] = max_xy[0]
+            self.direction = -self.direction
+        elif new_xy_pos[0] < min_xy[0]:
+            new_xy_pos[0] = min_xy[0]
+            self.direction = -self.direction
+
+        if new_xy_pos[1] > max_xy[1]:
+            new_xy_pos[1] = max_xy[1]
+            self.direction = -self.direction
+        elif new_xy_pos[1] < min_xy[1]:
+            new_xy_pos[1] = min_xy[1]
+            self.direction = -self.direction
+            
         self.set_position_dir(new_xy_pos, self.direction)
+
+        return total_motion
 
 
 
 class Plant(SimpleOrganism):
     def __init__(self):
         super().__init__()
-        self.genes['max_step'] = 0    #plants don't move, so this is zero
+        self.genes['max_step'] = 0.01    #plants don't move, so this is zero
         self.set_rgba(20/255, 255/255, 50/255, 1)
 
 class Predator(SimpleOrganism):
     def __init__(self):
         super().__init__()
         self.genes['num_sides'] = 3
+        self.genes['max_energy'] = 100
 

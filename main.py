@@ -5,8 +5,8 @@ from organism import Organism
 import matplotlib.pyplot as plt
 
 SIMULATION_PARAMS = {
-    'generations'   : 1000,
-    'timesteps'     : 100000,   #number of timesteps per generation
+    'generations'   : 50,
+    'timesteps'     : 1000,   #number of timesteps per generation
     'mutation_rate' : 0.03,     #not sure if this should go into world parameters or here, or if there should be only one global parameter variable
 }
 
