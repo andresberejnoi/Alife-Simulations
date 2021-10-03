@@ -117,6 +117,9 @@ class SimpleOrganism(object):
 
         self.alive  = True 
 
+
+        self.fitness_score  = 0
+
     def isalive(self):
         return self.alive
 
