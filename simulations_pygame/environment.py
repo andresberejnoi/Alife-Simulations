@@ -1,7 +1,8 @@
 import pygame
 import numpy as np
+import sys
 
-from organism import Organism
+from organism import PyGameOrganism
 from basic_colors import *
 
 class Simulation(object):
@@ -26,7 +27,7 @@ class Simulation(object):
             y = np.random.randint(0, self.HEIGHT + 1)
 
             speed = np.random.rand(2) * 2 - 1
-            org   = Organism(x, y, self.WIDTH, self.HEIGHT, color=BLUE, speed=speed)
+            org   = PyGameOrganism(x, y, self.WIDTH, self.HEIGHT, color=BLUE, speed=speed)
             self.alive_container.add(org)
             self.population_container.add(org)
         

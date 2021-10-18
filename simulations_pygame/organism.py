@@ -1,5 +1,3 @@
-from numpy.lib.arraysetops import isin
-from numpy.lib.twodim_base import _trilu_indices_form_dispatcher
 import pygame
 import numpy as np
 
@@ -18,9 +16,12 @@ def change_color(rgb_tup=[], change_pos=[], change_amounts=[]):
 
 class BaseOrganism(object):
     def __init__(self):
-        pass 
+        pass        
 
-class Organism(pygame.sprite.Sprite):
+class Organism(object):
+    pass                    
+
+class PyGameOrganism(pygame.sprite.Sprite):
     def __init__(self, 
                  x, 
                  y, 
@@ -74,12 +75,12 @@ class Organism(pygame.sprite.Sprite):
     #=============================Evolutionary Functions====================================#
     @classmethod
     def produce_phenotype(genome):
-        '''read genome and produce an Organism object 
+        '''read genome and produce an PyGameOrganism object 
         with the specified properties'''
 
-        return Organism(0,0,600,400) 
+        return PyGameOrganism(0,0,600,400) 
 
-    #=============================Organism Functionality====================================#
+    #=============================PyGameOrganism Functionality====================================#
     def dies(self):
         self.alive = False
         self.color = RED

@@ -1,12 +1,41 @@
+from types import SimpleNamespace
+
 def eye_decoder(self, gene, *params):
-    props = gene.properties
-    val   = gene.value
+    pass 
 
-    #assuming gene is a 32-bit int
-    rgb_mask  = 0x00380000
-    rgb_shift = 19
 
-    rgb_vals = (gene & rgb_mask) >> rgb_shift
-    has_r = (rgb_vals & 0x4) >> 2
-    has_g = (rgb_vals & 0x2) >> 1
-    has_b = (rgb_vals & 0x1)
+class DefaultGeneDecoder(object):
+    def __init__(self, name, gene_id, gene_body):
+        self.name      = name
+        self.gene_id   = gene_id
+        self.gene_body = gene_body
+
+    def __repr__(self) -> str:
+        return f"<Gene decoder for: {self.name.upper()} (id: {self.gene_id})>"
+
+    @classmethod
+    def make_bool(cls, str_bit):
+        assert (len(str_bit) == 1)
+        return bool(int(str_bit))
+
+class EyeDecoder(DefaultGeneDecoder):
+    def decode(self):
+        str_bits = f"{self.gene_body:b}"    #returns the binary representation of the number, excluding the '0b' at the beginning
+        
+        rgb_ultraviolet = (self.make_bool(str_bits[0]),
+                           self.make_bool(str_bits[1]),
+                           self.make_bool(str_bits[2]),
+                           self.make_bool(str_bits[3]))
+
+
+        eye_attributes = SimpleNamespace(
+            red   = (True if str_bits[0]=='1' else False),
+            green = (True if str_bits[1]=='1' else False),
+            blue  = (True if str_bits[2]=='1' else False),
+            uv    = (True if str_bits[3]=='1' else False),
+            #rgb   = (int(red), int(green), int(blue))
+        )
+
+def decode_metabolic_gene(gene_switch, gene_id, gene_body):
+    str_bits = f"{gene_body}"
+

@@ -33,7 +33,42 @@ gene_names = [
 
 ]
 
-#I'm numbering the genes automatically because I'm lazy to designate a specific number for speech
+#I'm numbering the genes automatically because I'm lazy to designate a specific number for each
 DEFAULT_GENES ={
     i:gene_name for i,gene_name in enumerate(gene_names)
 }
+
+#Some of the basic input neurons were taken from David Randall Miller's video here:
+# https://www.youtube.com/watch?v=N3tRFayqVtk&t=668s
+
+#the sensory inputs could be specific to only the front of the creature, or maybe I'll just keep it general to any side for now
+DEFAULT_INPUT_NEURONS = [
+    'pheromone_level',
+    'pheromone_dir_x',
+    'pheromone_dir_y',
+    'attack_power',
+    'age',
+    'color_r',
+    'color_g',
+    'color_b',
+    'last_x',
+    'last_y',
+    'current_x',
+    'current_y',
+    'biomass_density',   #equivalent to population density from the video linked above, but I think I like Biomass better. I might change it
+    'biomass_dir_x',     #direction in x towards greatest biomass
+    'biomass_dir_y',     
+    'oscillator',   #this one could have interesting applications, like delayed responses to long term stimuli
+
+    #Sensors for detecting the closest creature ()
+    'genetic_distance',     #genetic closeness to the nearest creature
+    'neighbor_age',
+    'neighbor_color_r',
+    'neighbor_color_g',
+    'neighbor_color_b',
+    'neighbor_defense',
+    'neighbor_dir_x',
+    'neighbor_dir_y',
+    
+
+]
