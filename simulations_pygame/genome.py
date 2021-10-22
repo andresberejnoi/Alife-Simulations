@@ -156,7 +156,8 @@ def get_random_brain_genome(max_connections=25,gene_length=32):
     genome = [start_marker]    #start the genome with the brain starter marker
 
     max_val   = int('1'*gene_length, 2) #for 32 bits it will be 0xFFFFFFFF
-    data_type = np.__dict__.get(f"np.uint{gene_length}", np.uint32)  #get the correct dtype from numpy, or default to np.uint32 if there is no match
+    #data_type = np.__dict__.get(f"np.uint{gene_length}", np.uint32)  #get the correct dtype from numpy, or default to np.uint32 if there is no match
+    data_type = getattr(np, f"uint{gene_length}", np.uint32)
     for i in range(num_conns):
         if gene_length==32:
             gene = np.random.randint(0,max_val, dtype=data_type)
@@ -169,7 +170,8 @@ def get_random_brain_genome(max_connections=25,gene_length=32):
             for m in range(3):
                 gene = np.random.randint(0,max_val, dtype=data_type)
                 genome.append(gene)
-
+        else:
+            gene = np.random.randint(0, max_val, dtype=data_type)
     genome.append(end_marker)
     return genome
 
