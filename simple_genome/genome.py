@@ -1,4 +1,5 @@
 import numpy as np
+from decoders import EmptyDecoder
 
 class Genome(object):
     def __init__(self, genes=[]):
@@ -17,9 +18,6 @@ class Organism(object):
 
 class Gene(object):
     pass 
-
-class EmptyGeneDecoder(object):
-    pass
 
 class Factory(object):
     def __init__(self,
@@ -90,7 +88,7 @@ class Factory(object):
                 if is_on:
                     gene_id  = self.get_gene_id(gene)
                     gene_val = self.get_gene_val(gene, str_mode=True)  #I'm using string mode to preserve leading zeros, since Python integers will just truncate the bit length until the first 1. I could use fixed-length ints like numpy.uint32 instead
-                    decoder  = self.gene_decoders.get(gene_id, EmptyGeneDecoder)
+                    decoder  = self.gene_decoders.get(gene_id, EmptyDecoder)
 
                     org_attributes += decoder.decode(gene_val)
 
