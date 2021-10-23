@@ -1,5 +1,3 @@
-from default_genes import DEFAULT_GENES
-
 class BaseDecoder(object):
     def __init__(self, gene_id=None, name='base_decoder'):
         self.name = name
@@ -27,7 +25,21 @@ class EyeDecoder(BaseDecoder):
     def __init__(self, gene_id, name='Eye'):
         super().__init__(gene_id, name)
     def decode(self, gene_value):
-        attrs = [('sensor_r',1), ('sensor_g',1), ('sensor_b',1)]
+        attrs = [('sensor_r',1), ('sensor_g',1), ('sensor_b',1), ('vision_distance',5)]
+        return attrs
+
+class EarDecoder(BaseDecoder):
+    def __init__(self, gene_id=None, name='Ear'):
+        super().__init__(gene_id=gene_id, name=name)
+    def decode(self, gene_value):
+        attrs=[('hearing_distance',5)]
+        return attrs
+
+class NoseDecoder(BaseDecoder):
+    def __init__(self, gene_id=None, name='Nose'):
+        super().__init__(gene_id=gene_id, name=name)
+    def decode(self, gene_value):
+        attrs=[('smelling_distance',5)]
         return attrs
 
 class StomachDecoder(BaseDecoder):
@@ -59,34 +71,76 @@ class SpeedDecoder(BaseDecoder):
         return attrs
 
 class GrowthDecoder(BaseDecoder):
-    def __init__(self, gene_id=None, name='Growth'):
+    def __init__(self, gene_id=None, name='growth_rate'):
         super().__init__(gene_id=gene_id, name=name)
     def decoder(self, gene_value):
         attrs=[('growth_rate',50)]
         return attrs
 
-class PheromoneDecoder(BaseDecoder):
-    def __init__(self, gene_id=None, name='Pheromone'):
+class SizeDecoder(BaseDecoder):
+    def __init__(self, gene_id=None, name='Size'):
         super().__init__(gene_id=gene_id, name=name)
     def decode(self, gene_value):
-        attrs=[]
+        attrs=[('max_size',20)]
+        return attrs
 
-class SkinDecoder(BaseDecoder):
-    def __init__(self, gene_id=None, name='Base Skin'):
+class PheromoneDecoder(BaseDecoder):
+    def __init__(self, gene_id=None, name='pheromone'):
         super().__init__(gene_id=gene_id, name=name)
     def decode(self, gene_value):
-        attrs=[]
+        '''pheromone_channel -> can be 0, 1, 2 (corresponding to r,g,b'''
+        attrs=[('pheromone_strength',10), ('pheromone_channel',0)]
+
+class SkinColorRedDecoder(BaseDecoder):
+    def __init__(self, gene_id=None, name='skin_color_red'):
+        super().__init__(gene_id=gene_id, name=name)
+    def decode(self, gene_value):
+        attrs=[('skin_color_r',255)]
+        return attrs
+class SkinColorGreenDecoder(BaseDecoder):
+    def __init__(self, gene_id=None, name='skin_color_green'):
+        super().__init__(gene_id=gene_id, name=name)
+    def decode(self, gene_value):
+        attrs=[('skin_color_g',255)]
+        return attrs
+
+class SkinColorBlueDecoder(BaseDecoder):
+    def __init__(self, gene_id=None, name='skin_color_blue'):
+        super().__init__(gene_id=gene_id, name=name)
+    def decode(self, gene_value):
+        attrs=[('skin_color_b',255)]
+        return attrs
+
+class SkinAlphaDecoder(BaseDecoder):
+    def __init__(self, gene_id=None, name='skin_alpha'):
+        super().__init__(gene_id=gene_id, name=name)
+    def decode(self, gene_value):
+        attrs=[('skin_alpha',1.0)]
         return attrs
 
 decoder_constructors = [ 
     EyeDecoder,
-    PheromoneDecoder
+    EarDecoder,
+    NoseDecoder,
+    PheromoneDecoder,
+    StomachDecoder,
+    LungDecoder,
+    SpeedDecoder,
+    GrowthDecoder,
+    SizeDecoder,
+    SkinColorRedDecoder,
+    SkinColorGreenDecoder,
+    SkinColorBlueDecoder,
+    SkinAlphaDecoder,
+
 ]
 
-def construct_decoder_directory(default_genes=DEFAULT_GENES):
+def construct_decoder_directory(decoder_constructors=decoder_constructors):
     gene_decoders = dict()
-    for gene_id in default_genes:
-        decoder = 
-        gene_decoders[gene_id]
+    for gene_id, constructor in enumerate(decoder_constructors, 2):
+        decoder = constructor(gene_id=gene_id)
+        gene_decoders[gene_id] = decoder 
+    return gene_decoders
+
 
 
