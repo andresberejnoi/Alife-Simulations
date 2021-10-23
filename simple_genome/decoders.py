@@ -17,9 +17,13 @@ class BaseDecoder(object):
         -------
         List of tuples. Each tuple contains an attribute name and its value.
         '''
+        return [('empty',True)]
+
     def __repr__(self):
         return f"<Decoder for Gene {self.name}, id={self.id}>"
 
+class EmptyDecoder(BaseDecoder):
+    pass 
 
 class EyeDecoder(BaseDecoder):
     def __init__(self, gene_id, name='Eye'):
@@ -45,7 +49,7 @@ class NoseDecoder(BaseDecoder):
 class StomachDecoder(BaseDecoder):
     def __init__(self, gene_id, name='Stomach'):
         super().__init__(gene_id=gene_id, name=name)
-    def decode(self,gene_value):
+    def decode(self, gene_value):
         '''
         0 -> 000 -> sunlight
         1 -> 001 -> plant
@@ -59,21 +63,21 @@ class StomachDecoder(BaseDecoder):
 class LungDecoder(BaseDecoder):
     def __init__(self, gene_id=None, name='Lung'):
         super().__init__(gene_id=gene_id, name=name)
-    def decode(self,gene_value):
+    def decode(self, gene_value):
         attrs=[('lung_type',0), ('lung_capacity',100)]
         return attrs
     
 class SpeedDecoder(BaseDecoder):
     def __init__(self, gene_id=None, name='Speed'):
         super().__init__(gene_id=gene_id, name=name)
-    def decoder(self, gene_value):
+    def decode(self, gene_value):
         attrs=[('max_speed', 100)]
         return attrs
 
 class GrowthDecoder(BaseDecoder):
     def __init__(self, gene_id=None, name='growth_rate'):
         super().__init__(gene_id=gene_id, name=name)
-    def decoder(self, gene_value):
+    def decode(self, gene_value):
         attrs=[('growth_rate',50)]
         return attrs
 
@@ -97,6 +101,7 @@ class SkinColorRedDecoder(BaseDecoder):
     def decode(self, gene_value):
         attrs=[('skin_color_r',255)]
         return attrs
+
 class SkinColorGreenDecoder(BaseDecoder):
     def __init__(self, gene_id=None, name='skin_color_green'):
         super().__init__(gene_id=gene_id, name=name)
