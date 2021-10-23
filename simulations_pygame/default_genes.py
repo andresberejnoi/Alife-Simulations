@@ -9,7 +9,7 @@ gene_names = [
     'pheromone',    #controls type and emission of pheromones to leave messages 
     'memory',    #controls whether the organism has some memory and how it is arranged. Memory can be used to keep temporary values
     'data_output',   #controls the ability of this organism to transmit data into its surroundings, so it can be picked up by others
-    'brain',    #Not sure how to handle this yet, but it should control the basic setup for a neural network of some sort, or basic reactions to stimuli
+    #'brain',    #Not sure how to handle this yet, but it should control the basic setup for a neural network of some sort, or basic reactions to stimuli
 
     'speed',   #controls max speed for the organism
     'energy_storage', 'metabolic_rate',  #metabolic rate determines how quickly an organism loses energy but also how much energy the organism can use in a single operation. i.e. a high metabolic rate will allow the organism to engage in high energy activities, like running and chasing prey. A low rate will allow the organism to be more energy efficient and move more slowly, like a snail
