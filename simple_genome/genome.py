@@ -52,22 +52,22 @@ class Factory(object):
 
         self.gene_decoders = gene_decoders
     
-    @classmethod
-    def is_gene_on(cls, gene):
+    #@classmethod
+    def is_gene_on(self, gene):
         if isinstance(gene, Gene):
             return gene.is_on()
-        return bool(gene & cls.SWITCH_BIT_MASK)
+        return bool(gene & self.SWITCH_BIT_MASK)
 
-    @classmethod
-    def get_gene_id(cls, gene):
-        gene_id = (gene & cls.ID_MASK) >> cls.ID_SHIFT
+    #@classmethod
+    def get_gene_id(self, gene):
+        gene_id = (gene & self.ID_MASK) >> self.ID_SHIFT
         return gene_id
     
-    @classmethod
-    def get_gene_val(cls, gene, str_mode=True):
-        gene_val = (gene & cls.GENE_VALUE_MASK) >> cls.VALUE_SHIFT
+    #@classmethod
+    def get_gene_val(self, gene, str_mode=True):
+        gene_val = (gene & self.GENE_VALUE_MASK) >> self.VALUE_SHIFT
         if str_mode:
-            gene_val = f"{gene_val:0{cls.VALUE_LENGTH}b}"    #converts gene int into str, with leading zeros if necessary to maintain the appropriate length
+            gene_val = f"{gene_val:0{self.VALUE_LENGTH}b}"    #converts gene int into str, with leading zeros if necessary to maintain the appropriate length
         return gene_val
 
     def generate_organism(self, genome=[], verbose=False):
