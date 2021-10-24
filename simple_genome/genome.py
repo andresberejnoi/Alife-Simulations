@@ -88,8 +88,9 @@ class Factory(object):
                 if is_on:
                     gene_id  = self.get_gene_id(gene)
                     gene_val = self.get_gene_val(gene, str_mode=True)  #I'm using string mode to preserve leading zeros, since Python integers will just truncate the bit length until the first 1. I could use fixed-length ints like numpy.uint32 instead
-                    decoder  = self.gene_decoders.get(gene_id, EmptyDecoder)
+                    decoder  = self.gene_decoders.get(gene_id, EmptyDecoder())
 
+                    print(f"Decoding ID:{gene_id} with decoder:\n\t{decoder}")
                     org_attributes += decoder.decode(gene_val)
 
                 else:
@@ -102,3 +103,13 @@ class Factory(object):
             setattr(org, attr[0], attr[1])
 
         return org
+
+
+def create_random_genome(max_gene_id=15, num_genes=30, gene_length=32, id_length=8, switch_length=1):
+    data_type = getattr(np, f"uint{gene_length}", np.uint32)
+    uint_maker = data_type
+    mask = uint_maker(0xfffffe01)    #if bit_length is 32, then this is like doing np.uint32(0x....)
+    genome = np.random.randint(0xffffffff, size=num_genes, dtype=data_type)
+    restricted_ids = np.random.randint(2, max_gene_id, size=num_genes, dtype=data_type)
+    genome = (genome & mask) | restricted_ids
+    return genome
