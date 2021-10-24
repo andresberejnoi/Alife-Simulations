@@ -17,13 +17,15 @@ class BaseDecoder(object):
         -------
         List of tuples. Each tuple contains an attribute name and its value.
         '''
-        return [('empty',True)]
 
     def __repr__(self):
         return f"<Decoder for Gene {self.name}, id={self.id}>"
 
 class EmptyDecoder(BaseDecoder):
-    pass 
+    def __init__(self, gene_id=None, name='Empty'):
+        super().__init__(gene_id=gene_id, name=name)
+    def decode(self, gene_value):
+        return [('empty',True)]
 
 class EyeDecoder(BaseDecoder):
     def __init__(self, gene_id, name='Eye'):
@@ -94,6 +96,7 @@ class PheromoneDecoder(BaseDecoder):
     def decode(self, gene_value):
         '''pheromone_channel -> can be 0, 1, 2 (corresponding to r,g,b'''
         attrs=[('pheromone_strength',10), ('pheromone_channel',0)]
+        return attrs
 
 class SkinColorRedDecoder(BaseDecoder):
     def __init__(self, gene_id=None, name='skin_color_red'):
