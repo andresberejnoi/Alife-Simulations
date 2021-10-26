@@ -7,7 +7,7 @@ I made minor modifications to fit with the way Python works and added
 a couple of helpful functions. This file can help make the code more accessible.
 """
 
-from numpy.core.arrayprint import DatetimeFormat
+
 
 
 SOURCE_LAYER_ID_MASK    = 0x80000000    #1 bit
@@ -42,7 +42,7 @@ class Connection(object):
     
     def __repr__(self):
         return f"<Conn s_type: {self.source_type}, s_id: {self.source_id} " +\
-               f"| t_type: {self.target_type}, t_id: {self.target_id}>"
+               f"| t_type: {self.target_type}, t_id: {self.target_id} | weight={self.weight}>"
         
     def copy(self):
         return Connection(self.source_type, self.source_id,
@@ -81,8 +81,25 @@ class NeuralNet(object):
         self.connections = connections
         self.neurons     = neurons
 
-def apply_mask(val, mask, left_shift=0):
-    return (val & mask) >> left_shift
+#----------------------------------
+def adjust_weight(weight, div_factor=10_000, bit_length=16):
+    data_type = getattr(np, f"int{bit_length}", np.int16)  #should be a signed 16-bit int constructor
+    #low  = np.iinfo(data_type).min
+    #high = np.iinfo(data_type).max 
+    #byte_size = 8
+    #num_bytes = bit_length // byte_size
+
+    #bytes_weight = weight.to_bytes(num_bytes, byteorder='little')  #assumes weight is a Python int #only two bytes for a 16-bit number
+    #print(weight)
+    bytes_weight = weight.tobytes()   #assumes weight is a numpy int
+    new_weight   = np.frombuffer(bytes_weight, dtype=data_type)[0]  #this actually returns and array so we need to get the first element
+    
+    return new_weight / div_factor   #the value will be around -3.2 to 3.2
+
+def apply_mask(val, mask, left_shift, astype=None):
+    if astype is None:
+        astype = np.uint16
+    return ((val & mask) >> left_shift).astype(astype)   #assumes val is a numpy int
 
 def decode_gene(gene):
     source_type = apply_mask(gene, SOURCE_LAYER_ID_MASK, SOURCE_LAYER_ID_SHIFT)
@@ -91,7 +108,7 @@ def decode_gene(gene):
     target_type = apply_mask(gene, TARGET_LAYER_ID_MASK, TARGET_LAYER_ID_SHIFT)
     target_id   = apply_mask(gene, TARGET_NEURON_ID_MASK, TARGET_NEURON_ID_SHIFT)
 
-    weight      = apply_mask(gene, WEIGHT_MASK, WEIGHT_SHIFT)
+    weight      = apply_mask(gene, WEIGHT_MASK, WEIGHT_SHIFT, astype=np.int16)
 
     return (source_type, source_id,
             target_type, target_id,
@@ -101,6 +118,8 @@ def build_connection_list(genome):
     connection_list = []
     for gene in genome:
         source_type, source_id, target_type, target_id, weight = decode_gene(gene)
+        weight = adjust_weight(weight, 10_000)    #the original code uses something closer to 8000
+        #weight = weight / 10_000
         conn = Connection(source_type, source_id, target_type, target_id, weight)
         connection_list.append(conn)
     
@@ -301,7 +320,7 @@ if __name__ == '__main__':
     high            = np.iinfo(data_type).max 
     num_connections = 25
 
-    #----Making Genome
+    #----Making Genome   (use numpy since some internal parts assume numpy types)
     genome    = np.random.randint(low, high, size=num_connections, dtype=data_type)
 
     #----Build Initial Connection List
