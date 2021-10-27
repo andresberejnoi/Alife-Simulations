@@ -5,10 +5,12 @@ https://github.com/davidrmiller/biosim4/blob/main/src/genome.cpp
 
 I made minor modifications to fit with the way Python works and added
 a couple of helpful functions. This file can help make the code more accessible.
+
+Additionally, I changed a few of the variable names used in the original code
+to better fit with the way I understand the problem. For example, in the C++
+code, `NEURON` refers to the hidden neurons in my code, while sensors and actions 
+refer to what I call input and output neurons, respectively.
 """
-
-
-
 
 SOURCE_LAYER_ID_MASK    = 0x80000000    #1 bit
 SOURCE_LAYER_ID_SHIFT   = 31
