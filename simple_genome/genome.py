@@ -120,11 +120,10 @@ def create_random_genome(max_gene_id=15, num_genes=30, gene_length=32, id_length
 
 #===========================
 class Neuron(object):
-    def __init__(self, neuron_id, neuron_type='hidden', connections=[], weights=[], activation_func=np.tanh):
+    def __init__(self, neuron_id, neuron_type='hidden', connections=[], activation_func=np.tanh):
         self.type        = neuron_type
         self.id          = neuron_id
         self.connections = connections
-        self.weights     = weights
         if self.type.lower()=='input':
             self.activation_func = lambda x: x
         else:  #hidden and output neurons have the same activation, but this can be easily changed
@@ -149,11 +148,11 @@ def apply_mask(val, mask, left_shift=0):
     return (val & mask) >> left_shift
 
 def create_brain(genome, weight_div_constant=10_000):
-    INPUT_LAYER_ID_MASK    = 0x80000000
-    INPUT_LAYER_ID_SHIFT   = 31
+    SOURCE_LAYER_ID_MASK    = 0x80000000
+    SOURCE_LAYER_ID_SHIFT   = 31
 
-    INPUT_NEURON_ID_MASK   = 0x7f000000
-    INPUT_NEURON_ID_SHIFT  = 24
+    SOURCE_NEURON_ID_MASK   = 0x7f000000
+    SOURCE_NEURON_ID_SHIFT  = 24
 
     TARGET_LAYER_ID_MASK   = 0x00800000
     TARGET_LAYER_ID_SHIFT  = 23
@@ -164,9 +163,10 @@ def create_brain(genome, weight_div_constant=10_000):
     WEIGHT_MASK            = 0x0000ffff
     WEIGHT_SHIFT           = 0
     neurons = {'inputs':[], 'hidden':[], 'outputs':[]}
+    unique_neurons = []
     for gene in genome:
-        source_type = apply_mask(gene, INPUT_LAYER_ID_MASK, INPUT_LAYER_ID_SHIFT)
-        source_id   = apply_mask(gene, INPUT_NEURON_ID_MASK, INPUT_NEURON_ID_SHIFT)
+        source_type = apply_mask(gene, SOURCE_LAYER_ID_MASK, SOURCE_LAYER_ID_SHIFT)
+        source_id   = apply_mask(gene, SOURCE_NEURON_ID_MASK, SOURCE_NEURON_ID_SHIFT)
 
         target_type = apply_mask(gene, TARGET_LAYER_ID_MASK, TARGET_LAYER_ID_SHIFT)
         target_id   = apply_mask(gene, TARGET_NEURON_ID_MASK, TARGET_NEURON_ID_SHIFT)
@@ -189,68 +189,3 @@ def create_brain(genome, weight_div_constant=10_000):
         neurons[target_layer].append(target_id)
 
         neuron = Neuron()
-
-class NeuralNetwork(object):
-    INPUT_LAYER_ID_MASK    = 0x80000000
-    INPUT_LAYER_ID_SHIFT   = 31
-
-    INPUT_NEURON_ID_MASK   = 0x7f000000
-    INPUT_NEURON_ID_SHIFT  = 24
-
-    TARGET_LAYER_ID_MASK   = 0x00800000
-    TARGET_LAYER_ID_SHIFT  = 23
-
-    TARGET_NEURON_ID_MASK  = 0x007f0000
-    TARGET_NEURON_ID_SHIFT = 16
-    
-    WEIGHT_MASK            = 0x0000ffff
-    WEIGHT_SHIFT           = 0
-    def apply_mask(self, val, mask, shift=0):
-        return (val & mask) >> shift
-
-    def __init__(self, brain_genome=None):
-        self.layers = [] #list of lists
-        self.input_layer  = []
-        self.hidden_layer = []
-        self.output_layer = []
-        self.connections  = None
-        self.brain_genome = brain_genome
-
-    def construct_brain(self):
-        self.input_layer  = {}
-        self.hidden_layer = {}
-        self.output_layer = {}
-
-        for connection in self.brain_genome:
-            source_type = self.apply_mask(connection, self.INPUT_LAYER_ID_MASK, self.INPUT_LAYER_ID_SHIFT)
-            source_id   = self.apply_mask(connection, self.INPUT_NEURON_ID_MASK, self.INPUT_NEURON_ID_SHIFT)
-
-            target_type = self.apply_mask(connection, self.TARGET_LAYER_ID_MASK, self.TARGET_LAYER_ID_SHIFT)
-            target_id   = self.apply_mask(connection, self.TARGET_NEURON_ID_MASK, self.TARGET_NEURON_ID_SHIFT)
-
-            weight      = self.apply_mask(connection, self.WEIGHT_MASK, self.WEIGHT_SHIFT)
-            
-            if source_type == 0:  #input layer
-                source_layer = self.input_layer
-            else:                 #hidden layer
-                source_layer = self.hidden_layer
-
-            try:
-                source_layer[source_id].append(weight)
-            except KeyError:
-                source_layer[source_id] = [weight]
-
-            if target_type == 0:  #hidden layer
-                target_layer = self.hidden_layer
-            else:                 #output layer
-                target_layer = self.output_layer
-            
-            try:
-                target_layer[target_id].append(weight)
-
-
-    def feedforward(self, input_vector):
-        to_hidden = []  #store outputs from input layer
-        for in_neuron,input_val in zip(self.input_layer,input_vector):
-            to_hidden.append(in_neuron.activate(input_val))
-            
