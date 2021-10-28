@@ -13,6 +13,27 @@ class Genome(object):
     def next(self):
         pass 
 
+class BaseOrganism(object):
+    
+    @property
+    def x_pos(self):
+        return self._x_pos
+
+    @x_pos.setter
+    def x_pos(self, new_val):
+        self._last_x = self._x_pos
+        self._x_pos = new_val
+    
+    @property
+    def y_pos(self):
+        return self._y_pos
+
+    @y_pos.setter
+    def y_pos(self, new_val):
+        self._last_y = self._y_pos
+        self._y_pos = new_val
+
+
 class Organism(object):
     pass 
 
