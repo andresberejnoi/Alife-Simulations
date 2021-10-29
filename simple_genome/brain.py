@@ -123,6 +123,17 @@ class NeuralNet(object):
         self.num_senses  = num_senses
         self.num_outputs = num_outputs
 
+        #-----Create the accumulators and output vectors here 
+        # so that they are not created once on every feedforward computation
+        #self.output_vector       = np.zeros(shape=self.num_outputs)  #this will hold the output value of the 
+        #self.neuron_accumulators = np.zeros(shape=len(neurons))   #this will hold the output values of hidden neurons during feedfoward propagation
+        self._container_vectors_exist = False 
+
+    def set_up_container_vectors(self):
+        self.output_vector = np.zeros(shape=self.num_outputs)
+        self.neuron_accumulators = np.zeros(shape=self.num_hidden)
+        self._container_vectors_exist = True
+
     @property 
     def num_hidden(self):
         return len(self.neurons)
@@ -137,16 +148,15 @@ class NeuralNet(object):
             project description.
         '''
         num_neurons = self.num_hidden
-        print(self.num_outputs)
-        output_vector       = np.zeros(shape=self.num_outputs)
-        neuron_accumulators = np.zeros(shape=num_neurons)
+        self.output_vector.fill(0)           #reset the vector to zero
+        self.neuron_accumulators.fill(0)     #reset vector to zero
 
         outputs_computed = False 
         for conn in self.connections:
             if conn.target_type == 'output' and (not outputs_computed):
                 for neuron_idx in range(num_neurons):
                     if self.neurons[neuron_idx].driven:
-                        self.neurons[neuron_idx].output = self.activ_func(neuron_accumulators[neuron_idx])
+                        self.neurons[neuron_idx].output = self.activ_func(self.neuron_accumulators[neuron_idx])
 
                 outputs_computed = True 
 
@@ -160,11 +170,11 @@ class NeuralNet(object):
                 input_val = self.neurons[conn.source_id].output
             
             if conn.target_type == 'output':
-                output_vector[conn.target_id] += input_val * conn.weight
+                self.output_vector[conn.target_id] += input_val * conn.weight
             else:
-                neuron_accumulators[conn.target_id] += input_val * conn.weight
+                self.neuron_accumulators[conn.target_id] += input_val * conn.weight
 
-        return output_vector
+        return self.output_vector
 
 
 class BrainFactory(object):
@@ -497,6 +507,8 @@ class BrainFactory(object):
             # nnet.neurons[-1].output = self.initial_neuron_output()
             # nnet.neurons[-1].driven = node_dict[node_key].num_inputs_from_others != 0  #this is a boolean
 
+        #----Setup container vectors for the network to use during backpropagation
+        nnet.set_up_container_vectors()
         return nnet
         
         
