@@ -14,13 +14,19 @@ class Genome(object):
         pass 
 
 class BaseOrganism(object):
-    def __init__(self, init_xy=(0,0), max_xy=(500,500), min_xy=(-500,-500)):
+    def __init__(self, init_xy=(0,0), max_xy=(500,500), min_xy=(-500,-500), genome = []):
         self._max_x, self._max_y = max_xy 
         self._min_x, self._min_y = min_xy 
 
         self._x_pos, self._y_pos   = init_xy
         self._last_x, self._last_y = init_xy
+
+        #--- Every creature will have a genome
+        self._genome = genome
     
+    def get_genome(self):
+        return self._genome
+
     @property
     def x_pos(self):
         return self._x_pos
@@ -163,74 +169,3 @@ def create_random_genome(max_gene_id=15, num_genes=30, gene_length=32, id_length
     genome = (genome & mask) | restricted_ids
     return genome
 
-#===========================
-class Neuron(object):
-    def __init__(self, neuron_id, neuron_type='hidden', connections=[], activation_func=np.tanh):
-        self.type        = neuron_type
-        self.id          = neuron_id
-        self.connections = connections
-        if self.type.lower()=='input':
-            self.activation_func = lambda x: x
-        else:  #hidden and output neurons have the same activation, but this can be easily changed
-            self.activation_func = activation_func
-        
-        self.accum_input = 0   #accumulated inputs from the previous connections
-    
-    def accumulate_input(self, input_val):
-        self.accum_input += input_val
-
-    def activate(self, input_val=0):
-        self.accum_input += input_val
-        activated_input = self.activation_func(self.accum_input)
-        if self.type=='output':
-            return activated_input
-
-        for conn,weight in zip(self.connections, self.weights):
-            output = activated_input * weight
-            conn.accumulate_input(output)
-
-def apply_mask(val, mask, left_shift=0):
-    return (val & mask) >> left_shift
-
-def create_brain(genome, weight_div_constant=10_000):
-    SOURCE_LAYER_ID_MASK    = 0x80000000
-    SOURCE_LAYER_ID_SHIFT   = 31
-
-    SOURCE_NEURON_ID_MASK   = 0x7f000000
-    SOURCE_NEURON_ID_SHIFT  = 24
-
-    TARGET_LAYER_ID_MASK   = 0x00800000
-    TARGET_LAYER_ID_SHIFT  = 23
-
-    TARGET_NEURON_ID_MASK  = 0x007f0000
-    TARGET_NEURON_ID_SHIFT = 16
-    
-    WEIGHT_MASK            = 0x0000ffff
-    WEIGHT_SHIFT           = 0
-    neurons = {'inputs':[], 'hidden':[], 'outputs':[]}
-    unique_neurons = []
-    for gene in genome:
-        source_type = apply_mask(gene, SOURCE_LAYER_ID_MASK, SOURCE_LAYER_ID_SHIFT)
-        source_id   = apply_mask(gene, SOURCE_NEURON_ID_MASK, SOURCE_NEURON_ID_SHIFT)
-
-        target_type = apply_mask(gene, TARGET_LAYER_ID_MASK, TARGET_LAYER_ID_SHIFT)
-        target_id   = apply_mask(gene, TARGET_NEURON_ID_MASK, TARGET_NEURON_ID_SHIFT)
-
-        _weight     = apply_mask(gene, WEIGHT_MASK, WEIGHT_SHIFT)
-        weight      = _weight / weight_div_constant   #make the weight a small value between -3.2 to 3.0
-
-        
-        if source_type==0:     #input layer
-            source_layer = 'inputs' 
-        else:                  #hidden layer
-            source_layer = 'hidden' 
-
-        if target_type==0:     #hidden layer
-            target_layer = 'hidden' 
-        else:                  #output layer
-            target_layer = 'outputs' 
-
-        neurons[source_layer].append(source_id)
-        neurons[target_layer].append(target_id)
-
-        neuron = Neuron()
