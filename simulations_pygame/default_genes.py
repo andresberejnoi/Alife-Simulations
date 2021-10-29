@@ -51,6 +51,7 @@ DEFAULT_INPUT_NEURONS = [
     'color_r',
     'color_g',
     'color_b',
+    'color_alpha',
     'last_x',
     'last_y',
     'current_x',
@@ -69,6 +70,6 @@ DEFAULT_INPUT_NEURONS = [
     'neighbor_defense',
     'neighbor_dir_x',
     'neighbor_dir_y',
-    
+    'neighbor_distance'
 
 ]
