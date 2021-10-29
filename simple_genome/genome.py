@@ -107,13 +107,17 @@ class Factory(object):
             return gene.is_on()
         return bool(gene & self.SWITCH_BIT_MASK)
 
+    def renumber_gene_id(self, original_id):
+        return original_id % len(self.gene_decoders)  #the gene id will always be between 0 and the total number of available genes
+
     #@classmethod
     def get_gene_id(self, gene):
         gene_id = (gene & self.ID_MASK) >> self.ID_SHIFT
+        gene_id = self.renumber_gene_id(gene_id)    #I don't need this function call. It could be done in one line here, but I will keep it for now, so as to separate those processes just in case
         return gene_id
     
     #@classmethod
-    def get_gene_val(self, gene, str_mode=True):
+    def get_gene_val(self, gene, str_mode=True, astype=None):
         gene_val = (gene & self.GENE_VALUE_MASK) >> self.VALUE_SHIFT
         if str_mode:
             gene_val = f"{gene_val:0{self.VALUE_LENGTH}b}"    #converts gene int into str, with leading zeros if necessary to maintain the appropriate length
