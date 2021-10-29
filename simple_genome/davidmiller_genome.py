@@ -199,14 +199,14 @@ def make_node_list(node_dict={}, connection_list=[]):
     return node_dict
 
 def remove_connections_to_neuron(connection_list, node_dict, neuron_id):
-    remaining_connections = []
+    remaining_connections = [conn for conn in connection_list]
     for conn in connection_list:
         if conn.target_type=='hidden' and conn.target_id == neuron_id:
             if conn.source_type=='hidden':
                 node_dict[conn.source_id].num_outputs -= 1
-            
-        else:
-            remaining_connections.append(conn.copy())
+            remaining_connections.remove(conn)
+        # else:   #in the original code, the else statement goes with the outer if, but because I am accumulating useful connections instead of deleting useless ones, I need to append here
+        #     remaining_connections.append(conn.copy())
 
     return remaining_connections
 
