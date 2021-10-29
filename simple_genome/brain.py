@@ -1,7 +1,7 @@
 import numpy as np
 import pprint
 
-def make_sample_genome(input_to_hidden, input_to_ouptut, hidden_to_hidden, hidden_to_output):
+def make_sample_genome(input_to_hidden, input_to_ouptut, hidden_to_hidden, hidden_to_output, random_seed=None):
     genome = []
     low = np.iinfo(np.uint16).min
     high = np.iinfo(np.uint16).max
@@ -41,7 +41,28 @@ def make_sample_genome(input_to_hidden, input_to_ouptut, hidden_to_hidden, hidde
 
     return genome
     
-    
+def get_fixed_sample_genomes(random_seed=30):
+    sample_genomes = []
+    genome = make_sample_genome(   #one useless connection (hidden neuron 5)
+        [(0, 10), (2,10), (1,5)],
+        [(0, 2)],
+        [(10, 10), (10,5),],
+        [(10,2), (10, 3), (11, 10)]
+    )
+    sample_genomes.append(genome)
+
+    genome = make_sample_genome(
+        [(1, 10), (2,10), (1,5)],
+        [(0, 2), (1,3)],
+        [(10, 10), (10,5), (5,5), (5,11)],
+        [(10,2), (10, 3), (11, 10), (2,2)]
+    )
+
+    sample_genomes.append(genome)
+
+    return sample_genomes
+
+#==============================================================================================
 
 class Connection(object):
     def __init__(self, source_type, source_id, target_type, target_id, weight) -> None:
@@ -91,17 +112,20 @@ class Neuron(object):
         pass
 
     def __repr__(self):
-        return f"<Neuron type:{self.type.upper():6}, id:{self.id:>4}, remapped_id:{self.remapped_id:3}>"
+        return f"<Neuron type:{self.type.upper():6}, id:{self.id:>4}, remapped_id:{self.remapped_id:3}, driven={self.driven}>"
 
 class NeuralNet(object):
-    def __init__(self, connections=[], neurons=[], activation_func=np.tanh, num_senses=30, num_hidden=30, num_outputs=30):
+    def __init__(self, connections=[], neurons=[], activation_func=np.tanh, num_senses=30, num_outputs=30):
         self.connections = connections
         self.neurons     = neurons
         self.activ_func  = activation_func
 
         self.num_senses  = num_senses
-        self.num_hidden  = num_hidden
         self.num_outputs = num_outputs
+
+    @property 
+    def num_hidden(self):
+        return len(self.neurons)
 
     def feedforward(self, sensory_funcs={}):
         '''
@@ -112,7 +136,8 @@ class NeuralNet(object):
             that takes standard parameters, as defined by the
             project description.
         '''
-        num_neurons = len(self.neurons)
+        num_neurons = self.num_hidden
+        print(self.num_outputs)
         output_vector       = np.zeros(shape=self.num_outputs)
         neuron_accumulators = np.zeros(shape=num_neurons)
 
@@ -129,12 +154,15 @@ class NeuralNet(object):
             if conn.source_type == 'input':
                 #inputVal = getSensor((Sensor)conn.sourceNum, simStep);  #check what the cpp code does with get sensor. It might be significantly different from what I need
                 #input_val = 0
-                input_val = sensory_funcs.get(conn.source_id, lambda: np.random.rand())  #if sensor does not exist for some reason, return random value [0,1]
+                input_func = sensory_funcs.get(conn.source_id, lambda x: np.random.rand())  #if sensor does not exist for some reason, return random value [0,1]
+                input_val = input_func(self)
             else:
                 input_val = self.neurons[conn.source_id].output
             
             if conn.target_type == 'output':
                 output_vector[conn.target_id] += input_val * conn.weight
+            else:
+                neuron_accumulators[conn.target_id] += input_val * conn.weight
 
         return output_vector
 
@@ -142,8 +170,8 @@ class NeuralNet(object):
 class BrainFactory(object):
     def __init__(self, num_senses=30, max_hidden_neurons=128, num_outputs=30, gene_length=32, section_lengths=(1,7,1,7,16)):
         self.max_hidden_neurons =  max_hidden_neurons
-        self.num_senses = num_senses
-        self.num_outpus = num_outputs
+        self.num_senses  = num_senses
+        self.num_outputs = num_outputs
         
         assert(gene_length == sum(section_lengths))
         self.gene_length = gene_length
@@ -283,7 +311,7 @@ class BrainFactory(object):
             if new_conn.target_type == 'hidden':
                 new_conn.target_id %= self.max_hidden_neurons
             else:
-                new_conn.target_id %= self.num_outpus
+                new_conn.target_id %= self.num_outputs
         
         return renumbered_conn_list
 
@@ -339,7 +367,18 @@ class BrainFactory(object):
 
         return remaining_connections
 
-    
+    def remove_floating_connections_from_neuron(self, connection_list=[], node_dict={}, neuron_id=1000):
+        '''removes connections from a hidden neuron. This should happen when there is a hidden neuron with outgoing 
+        connections but no incoming connections'''
+        remaining_connections = [conn for conn in connection_list]
+        for conn in connection_list:
+            if conn.source_type=='hidden' and conn.source_id==neuron_id:
+                if conn.target_type=='hidden':
+                    node_dict[conn.target_id].num_inputs_from_others -= 1
+                remaining_connections.remove(conn)    
+
+        return remaining_connections
+
     def cull_useless_neurons(self, node_dict={}, connection_list=[], ):
         done = False
         while not done:
@@ -349,9 +388,14 @@ class BrainFactory(object):
                 assert(node_key < self.max_hidden_neurons)
                 node = node_dict[node_key]
 
-                if node.num_outputs == node.num_self_inputs:
+                if node.num_outputs == node.num_self_inputs:  #this clause is adapted from the original C++ code
                     done = False 
                     connection_list = self.remove_connections_to_neuron(connection_list, node_dict, node_key)
+                    delete_keys.append(node_key)
+
+                elif node.type.lower() == 'hidden' and node.num_inputs_from_others == 0:   # I added this to remove hidden neurons with no inputs, since the signal needs to start from a sensor to be valid
+                    done = False 
+                    connection_list = self.remove_floating_connections_from_neuron(connection_list, node_dict, node_key)
                     delete_keys.append(node_key)
 
 
@@ -416,7 +460,6 @@ class BrainFactory(object):
             new_number += 1
 
         #first, connections from input neurons, to hidden and hidden to hidden
-        pprint.pprint(connection_list)
         nnet.connections.clear()
         for conn in connection_list:
             if conn.target_type == 'hidden':
@@ -439,18 +482,20 @@ class BrainFactory(object):
 
 
         #----Calculate number of remaining neurons
-        num_senses, num_hidden, num_outputs = self.count_neuron_types(connection_list)
-        nnet.num_senses  = num_senses
-        nnet.num_hidden  = num_hidden
-        nnet.num_outputs = num_outputs
+        #num_senses, num_hidden, num_outputs = self.count_neuron_types(connection_list)
+        nnet.num_senses  = self.num_senses
+        #nnet.num_hidden  = num_hidden
+        nnet.num_outputs = self.num_outputs
         #-----
 
         nnet.neurons.clear()
         for node_key in node_dict:
             node = node_dict[node_key]
+            node.output = self.initial_neuron_output()
+            node.driven = node_dict[node_key].num_inputs_from_others != 0  #this is a boolean
             nnet.neurons.append(node)
-            nnet.neurons[-1].output = self.initial_neuron_output()
-            nnet.neurons[-1].driven = node_dict[node_key].num_inputs_from_others != 0  #this is a boolean
+            # nnet.neurons[-1].output = self.initial_neuron_output()
+            # nnet.neurons[-1].driven = node_dict[node_key].num_inputs_from_others != 0  #this is a boolean
 
         return nnet
         
