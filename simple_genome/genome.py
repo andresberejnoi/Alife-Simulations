@@ -14,6 +14,12 @@ class Genome(object):
         pass 
 
 class BaseOrganism(object):
+    def __init__(self, init_xy=(0,0), max_xy=(500,500), min_xy=(-500,-500)):
+        self._max_x, self._max_y = max_xy 
+        self._min_x, self._min_y = min_xy 
+
+        self._x_pos, self._y_pos   = init_xy
+        self._last_x, self._last_y = init_xy
     
     @property
     def x_pos(self):
@@ -21,6 +27,11 @@ class BaseOrganism(object):
 
     @x_pos.setter
     def x_pos(self, new_val):
+        #new_val = new_val % self._max_x
+        if new_val > self._max_x:
+            new_val = self._min_x + (new_val % self._max_x)
+        elif new_val < self._min_x:
+            new_val = self._max_x + (new_val % self._min_x)
         self._last_x = self._x_pos
         self._x_pos = new_val
     
@@ -28,13 +39,26 @@ class BaseOrganism(object):
     def y_pos(self):
         return self._y_pos
 
+    #---TODO Fix issues when abs(new_val) > (abs(_max_y) - abs(_min_y))
     @y_pos.setter
     def y_pos(self, new_val):
+        if new_val > self._max_y:
+            new_val = self._min_y + (new_val % self._max_y)
+        elif new_val < self._min_y:
+            new_val = self._max_y + (new_val % self._min_y)
         self._last_y = self._y_pos
         self._y_pos = new_val
+    
+    def update_pos(self, x_delta, y_delta):
+        '''update organism's position by adding the change in position to current one'''
+        self.x_pos += x_delta
+        self.y_pos += y_delta
 
+    def set_pos(self, x_pos, y_pos):
+        self.x_pos = x_pos
+        self.y_pos = y_pos
 
-class Organism(object):
+class Organism(BaseOrganism):
     pass 
 
 class Gene(object):
