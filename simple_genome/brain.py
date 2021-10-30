@@ -129,6 +129,9 @@ class NeuralNet(object):
         #self.neuron_accumulators = np.zeros(shape=len(neurons))   #this will hold the output values of hidden neurons during feedfoward propagation
         self._container_vectors_exist = False 
 
+    def __repr__(self):
+        return f"<NeuralNet: num_connections={len(self.connections):>3} | num_hidden_neurons={self.num_hidden:>3}>"
+        
     def set_up_container_vectors(self):
         self.output_vector = np.zeros(shape=self.num_outputs)
         self.neuron_accumulators = np.zeros(shape=self.num_hidden)
@@ -178,15 +181,24 @@ class NeuralNet(object):
 
 
 class BrainFactory(object):
-    def __init__(self, num_senses=30, max_hidden_neurons=128, num_outputs=30, gene_length=32, section_lengths=(1,7,1,7,16)):
+    def __init__(self, num_senses=30, 
+                 max_hidden_neurons=128, 
+                 num_outputs=30, 
+                 gene_length=32, 
+                 section_lengths=(1,7,1,7,16),):
+
         self.max_hidden_neurons =  max_hidden_neurons
-        self.num_senses  = num_senses
-        self.num_outputs = num_outputs
+        self.num_senses         = num_senses
+        self.num_outputs        = num_outputs
         
         assert(gene_length == sum(section_lengths))
         self.gene_length = gene_length
 
         self._set_up_masks(section_lengths)
+
+    def set_brain_guards(self, start_guard=0x1, end_guard=0x0):
+        self.START_GUARD = start_guard
+        self.END_GUARD   = end_guard
 
     def _print_masks(self):
         print("* self.SOURCE_LAYER_ID_MASK:")
@@ -259,11 +271,20 @@ class BrainFactory(object):
         self.WEIGHT_MASK            = _weight[0]          #0x0000ffff     #16 bits
         self.WEIGHT_SHIFT           = _weight[1]          #0
 
-    def make_random_genome(self, num_genes):
+    def make_random_brain_genome(self, num_genes, include_genome_guards=True, start_guard=0x1, end_guard=0x0):
         data_type = getattr(np, f"np.uint{self.gene_length}", np.uint32)
-        low = np.iinfo(data_type).min
-        high = np.iinfo(data_type).max
-        return np.random.randint(low, high, size=num_genes)
+        low       = np.iinfo(data_type).min
+        high      = np.iinfo(data_type).max
+
+        if include_genome_guards:
+            num_genes += 2     #add two to account for the 
+            genome     = np.random.randint(low, high, size=num_genes)
+            genome[0]  = start_guard
+            genome[1]  = end_guard
+
+        else:
+            genome = np.random.randint(low, high, size=num_genes)
+        return genome 
 
     def adjust_weight(self, weight, div_factor=10_000, bit_length=16):
         data_type = getattr(np, f"int{bit_length}", np.int16)  #should be a signed 16-bit int constructor
@@ -511,7 +532,21 @@ class BrainFactory(object):
         nnet.set_up_container_vectors()
         return nnet
         
-        
+def create_random_brain_genome(num_genes=20, gene_length=32, include_genome_guards=True, start_guard=0x1, end_guard=0x0):
+    data_type = getattr(np, f"np.uint{gene_length}", np.uint32)
+    low       = np.iinfo(data_type).min
+    high      = np.iinfo(data_type).max
+
+    if include_genome_guards:
+        num_genes += 2     #add two to account for the 
+        genome     = np.random.randint(low, high, size=num_genes)
+        genome[0]  = start_guard
+        genome[-1]  = end_guard
+
+    else:
+        genome = np.random.randint(low, high, size=num_genes)
+    return list(genome)
+
 def test_function():
     bf = BrainFactory()
     genome = make_sample_genome(
