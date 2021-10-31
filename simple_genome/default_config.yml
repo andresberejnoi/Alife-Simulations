@@ -1,0 +1,30 @@
+#-----
+#in every case, gene_length refers to the bit-length of each
+# individual gene
+phenotype_genome: 
+  gene_length   : 32
+  switch_length : 1
+  id_length     : 8
+
+brain_genome:
+  gene_length: 32
+  max_hidden_neurons: 128    #can't go more than 128 with 7 bits, unless the lengths are changed below...
+  section_lengths:
+    - 1  #source_layer_length
+    - 7  #source_neuron_length
+    - 1  #target_layer_length
+    - 7  #target_neuron_length
+    - 16 #weight_length
+
+mutation:
+  point_mutation_rate   : 0.01    #1 in 100
+  gene_duplication_rate : 0.005   #1 in 200
+
+marker_genes:
+  start_brain_marker : 0x1
+  end_brain_marker   : 0x0
+  null_gene          : 0xaaaaaaaa  #this should be probably removed. It is here for legacy
+
+simulation:
+  steps_per_generation: 300
+  
