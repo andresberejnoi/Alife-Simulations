@@ -131,7 +131,7 @@ class NeuralNet(object):
 
     def __repr__(self):
         return f"<NeuralNet: num_connections={len(self.connections):>3} | num_hidden_neurons={self.num_hidden:>3}>"
-        
+
     def set_up_container_vectors(self):
         self.output_vector = np.zeros(shape=self.num_outputs)
         self.neuron_accumulators = np.zeros(shape=self.num_hidden)
@@ -141,7 +141,7 @@ class NeuralNet(object):
     def num_hidden(self):
         return len(self.neurons)
 
-    def feedforward(self, sensory_funcs={}):
+    def feedforward(self, sensor_funcs={}):
         '''
         sensory_funcs: dict
             Dictionary of callables that return a value
@@ -167,7 +167,7 @@ class NeuralNet(object):
             if conn.source_type == 'input':
                 #inputVal = getSensor((Sensor)conn.sourceNum, simStep);  #check what the cpp code does with get sensor. It might be significantly different from what I need
                 #input_val = 0
-                input_func = sensory_funcs.get(conn.source_id, lambda x: np.random.rand())  #if sensor does not exist for some reason, return random value [0,1]
+                input_func = sensor_funcs.get(conn.source_id, lambda x: np.random.rand())  #if sensor does not exist for some reason, return random value [0,1]
                 input_val = input_func(self)
             else:
                 input_val = self.neurons[conn.source_id].output
