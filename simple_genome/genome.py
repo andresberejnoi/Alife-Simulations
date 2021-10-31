@@ -1,5 +1,4 @@
 import numpy as np
-from numpy import random
 from decoders import EmptyDecoder
 from brain import BrainFactory
 
@@ -81,9 +80,6 @@ class BaseOrganism(object):
 class Organism(BaseOrganism):
     pass 
 
-class Gene(object):
-    pass 
-
 class MutationChange(object):
     def __init__(self, gene_idx=0, original_gene=0, mutation_mask=0, changed_gene=0):
         self.gene_idx      = gene_idx 
@@ -92,11 +88,11 @@ class MutationChange(object):
         self.changed_gene  =  changed_gene
 
     def __repr__(self):
-        return f"* Point Mutation at Genome Position: {self.gene_idx:>3}\n\n" +\
+        return f"\n* Point Mutation at Genome Position: {self.gene_idx:>3}\n\n" +\
                f"\t{self.original_gene:032b} -> original gene\n" +\
                f"\t{self.mutation_mask:032b} -> bits flipped\n"  +\
                f"\t{'-'*32}\n" +\
-               f"\t{self.changed_gene:032b} -> result"
+               f"\t{self.changed_gene:032b} -> result\n"
 
 class Factory(object):
     def __init__(self,
@@ -141,8 +137,6 @@ class Factory(object):
     
     #@classmethod
     def is_gene_on(self, gene):
-        if isinstance(gene, Gene):
-            return gene.is_on()
         return bool(gene & self.SWITCH_BIT_MASK)
 
     def renumber_gene_id(self, original_id):
