@@ -55,29 +55,51 @@ class Neuron(object):
 #================================================================
 # Organism
 class BaseOrganism(object):
-    def __init__(self, init_xy=(0,0), max_xy=(500,500), min_xy=(-500,-500), genome = []):
-        self._max_x, self._max_y = max_xy 
-        self._min_x, self._min_y = min_xy 
+    def __init__(self, x_pos=0,y_pos=0, max_x=100, max_y=100, min_x=0, min_y=0):
+        self._max_x, self._max_y = max_x, max_y 
+        self._min_x, self._min_y = min_x, min_y
 
-        self._x_pos, self._y_pos   = init_xy
-        self._last_x, self._last_y = init_xy
+        self._x_pos, self._y_pos   = x_pos, y_pos
+        self._last_x, self._last_y = x_pos, y_pos
+    
+    @property
+    def max_x(self):
+        return self._max_x
 
-        #--- Every creature will have a genome
-        self._genome = genome
-    
-    def get_genome(self):
-        return self._genome
-    
+    @max_x.setter
+    def max_x(self, new_val):
+        self._max_x = int(new_val)
+
+    @property
+    def max_y(self):
+        return self._max_y
+
+    @max_y.setter
+    def max_y(self, new_val):
+        self._max_y = int(new_val)
+
+    @property
+    def min_x(self):
+        return self._min_x
+
+    @min_x.setter
+    def min_x(self, new_val):
+        self._min_x = int(new_val)
+
+    @property
+    def min_y(self):
+        return self._min_y
+
+    @min_y.setter
+    def min_y(self, new_val):
+        self._min_y = int(new_val)
+
     @property 
     def genome(self):
         return self._genome 
     
     @genome.setter
     def genome(self, genome):
-        self._genome = genome
-
-    def set_genome(self, genome):
-        #self._genome = [gene for gene in genome]
         self._genome = genome
 
     def print_genome(self, mode='bin'):
@@ -93,6 +115,7 @@ class BaseOrganism(object):
     @x_pos.setter
     def x_pos(self, new_val):
         #new_val = new_val % self._max_x
+        new_val = int(new_val)
         if new_val > self._max_x:
             new_val = self._min_x + (new_val % self._max_x)
         elif new_val < self._min_x:
@@ -107,6 +130,7 @@ class BaseOrganism(object):
     #---TODO Fix issues when abs(new_val) > (abs(_max_y) - abs(_min_y))
     @y_pos.setter
     def y_pos(self, new_val):
+        new_val = int(new_val)
         if new_val > self._max_y:
             new_val = self._min_y + (new_val % self._max_y)
         elif new_val < self._min_y:
@@ -123,6 +147,9 @@ class BaseOrganism(object):
         self.x_pos = x_pos
         self.y_pos = y_pos
 
+    def set_pos_boundaries(self, min_xy, max_xy):
+        self.max_x, self.max_y = max_xy
+        self.min_x, self.min_y = min_xy
 #==========================================================
 # Basic Gene 
 class Gene(object):
