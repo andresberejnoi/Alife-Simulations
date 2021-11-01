@@ -1,3 +1,10 @@
+"""
+Collection of phenotype gene decoders. Right now each decoder is a small class with a `decode` method. 
+However, since each class has just one method, it might be better to turn each decoder 
+into a simple function and make the code leaner. I will see if the __repr__ method 
+provides sufficient advantages to keep the class format.
+"""
+
 class BaseDecoder(object):
     def __init__(self, gene_id=None, name='base_decoder'):
         self.name = name
