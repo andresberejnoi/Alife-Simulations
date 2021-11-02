@@ -208,7 +208,7 @@ class BrainFactory(object):
 
         return remaining_connections
 
-    def cull_useless_neurons(self, node_dict={}, connection_list=[], ):
+    def cull_useless_neurons(self, node_dict={}, connection_list=[], remove_floating_hidden_neurons=True):
         done = False
         while not done:
             delete_keys = []
@@ -221,11 +221,11 @@ class BrainFactory(object):
                     done = False 
                     connection_list = self.remove_connections_to_neuron(connection_list, node_dict, node_key)
                     delete_keys.append(node_key)
-
-                elif node.type.lower() == 'hidden' and node.num_inputs_from_others == 0:   # I added this to remove hidden neurons with no inputs, since the signal needs to start from a sensor to be valid
-                    done = False 
-                    connection_list = self.remove_floating_connections_from_neuron(connection_list, node_dict, node_key)
-                    delete_keys.append(node_key)
+                elif remove_floating_hidden_neurons:
+                    if node.type.lower() == 'hidden' and node.num_inputs_from_others == 0:   # I added this to remove hidden neurons with no inputs, since the signal needs to start from a sensor to be valid
+                        done = False 
+                        connection_list = self.remove_floating_connections_from_neuron(connection_list, node_dict, node_key)
+                        delete_keys.append(node_key)
 
 
             for key in delete_keys:
@@ -266,7 +266,7 @@ class BrainFactory(object):
 
         return num_inputs, num_hidden, num_outputs
 
-    def create_brain_from_genome(self, genome):
+    def create_brain_from_genome(self, genome, remove_floating_hidden_neurons=True):
         node_dict = {}
 
         connection_list = self.build_connection_list(genome)
@@ -274,7 +274,7 @@ class BrainFactory(object):
 
         node_dict       = self.make_node_list(node_dict, connection_list)
 
-        node_dict, connection_list = self.cull_useless_neurons(node_dict, connection_list)
+        node_dict, connection_list = self.cull_useless_neurons(node_dict, connection_list, remove_floating_hidden_neurons)
         
         nnet = NeuralNet()
 
