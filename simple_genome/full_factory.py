@@ -59,44 +59,88 @@ class Factory(object):
         #first create the organism and then the brain, although
         # any order should work, I think...
         pheno_genome, brain_genome = self._separate_genomes(genome)
-        
+
         org        = self.phenotype_factory.create_organism_from_genome(pheno_genome)
         org.nnet   = self.brain_factory.create_brain_from_genome(brain_genome)
         org.genome = genome
         return org
 
     #======================MUTATIONS========================
-    def apply_point_mutations(self, genome, num_mutations=1, num_flips=1, use_genome_copy=False, protect_guards=True):
-        '''Randomly applies a mutation masks to a random gene or genes
+    def apply_point_mutations(self, genome, num_mutations=1, num_flips=1, 
+                              use_genome_copy=False, protect_guards=True,
+                              prevent_repeated_mutations=True):
+        '''Randomly applies a mutation masks to a random gene or genes (each mutation mask
+        will be randomly generated for each gene to mutate).
+
+        PARAMETERS
+        ----------
+        num_mutations: int
+            Number of genes from genome to mutate. The mutation will be applied to a 
+            random location in the genome. 
+        num_flips: int, str, list, tuple:
+            Number of bits to flip in a single gene. If int, then the number 
+            to flip is fixed. If str, then the only valid value is 'random'
+            and it will result in a mask where anywhere from 0 to self.GENE_LENGTH
+            bits will be flipped. 
+            If tuple or list, it should contain at least two elements. The first element
+            is the lower bound for a random number and the second element is the upper 
+            bound. This will also result in a random number of flips, but this allows to
+            control the min and max of the possible flips.
         protect_guards: bool
             If True, a mutation will not be applied to marker genes,
-            such as self.START_BRAIN_MARKER and self.END_BRAIN_MARKER'''
+            such as self.START_BRAIN_MARKER and self.END_BRAIN_MARKER
+        prevent_repeated_mutations: bool
+            If True, the function will keep track of which gene positions have been modified
+            already and prevent the same ones from being selected for the next mutation. 
+            This parameter is only useful if num_mutations > 1.
+        
+        RETURNS
+        -------
+        genome: Genome, list
+            A Genome object, or list containing the mutations that were applied.
+        changes: list
+            List of MutationChange objects to keep track of all changes applied to the genome'''
+
         data_type = getattr(np, f"uint{self.GENE_LENGTH}", np.uint32)
 
         if use_genome_copy:
             genome = Genome([gene for gene in genome])    #this local variable will reference a copy of the passed list
 
         if num_flips=='random':
-            num_flips = np.random.randint(0, self.GENE_LENGTH, dtype=data_type)
-        elif isinstance(num_flips, list):
+            num_flips = np.random.randint(0, self.GENE_LENGTH, dtype=data_type)  #number of bits to flip in a single gene will be from 0 to self.GENE_LENGTH-1, selected randomly
+        elif isinstance(num_flips, list) or isinstance(num_flips, tuple):
             lower_bound = num_flips[0]
             upper_bound = num_flips[1]
             num_flips = np.random.randint(lower_bound,upper_bound, dtype=data_type)
         
         len_genome = len(genome)
-        changes = []
-        for i in range(num_mutations):
-            rnd_gene_idx = np.random.randint(0, len_genome, dtype=data_type)
-            mutation_mask = self._get_composite_mutation_mask(num_flips, data_type)
+        changes = []            #keep track of the changes applied
+        if prevent_repeated_mutations and num_mutations > 1:
+            allowed_genome_positions = list(range(len(genome)))
+        else:
+            allowed_genome_positions = []
 
-            _change = MutationChange(gene_idx=rnd_gene_idx, original_gene=genome[rnd_gene_idx])
+        for i in range(num_mutations):
+
+            if prevent_repeated_mutations:
+                _helper_idx = np.random.randint(0, len(allowed_genome_positions), dtype=data_type)
+                rnd_gene_idx = allowed_genome_positions.pop(_helper_idx)    #remove the idx that has already been used
+            else:
+                rnd_gene_idx = np.random.randint(0, len_genome, dtype=data_type)
+
             if protect_guards:
                 while genome[rnd_gene_idx] in self.marker_genes:
                     rnd_gene_idx = np.random.randint(0, len_genome, dtype=data_type)   #keep getting a new idx until it is not a marker gene
+            
+            original_gene = genome[rnd_gene_idx]
+
+            mutation_mask = self._get_composite_mutation_mask(num_flips, data_type)
             genome[rnd_gene_idx] ^= mutation_mask   #this flips the bit or bits
 
-            _change.mutation_mask = mutation_mask
-            _change.changed_gene  = genome[rnd_gene_idx]
+            _change = MutationChange(gene_idx=rnd_gene_idx,
+                                     original_gene=original_gene,
+                                     mutation_mask=mutation_mask,
+                                     changed_gene=genome[rnd_gene_idx])
             changes.append(_change)
         return genome, changes
 
