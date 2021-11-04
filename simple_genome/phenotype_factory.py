@@ -78,4 +78,7 @@ class PhenotypeFactory(object):
         org = Organism()
         for attr in org_attributes:
             setattr(org, attr[0], attr[1])
+        
+        if not hasattr(org, 'type'):    #this is a cheat. I should at least append a stomach type gene after this so that it is a trait that can be passed down to children
+            org.type = 'plant'
         return org
