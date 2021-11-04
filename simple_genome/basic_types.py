@@ -1,5 +1,5 @@
 from genome import Genome    #It does not look good. I keep importing this into every file. Maybe it should be a basic type
-
+import numpy as np
 #==============================================================================================
 # Brain related classes
 class Connection(object):
@@ -108,6 +108,14 @@ class BaseOrganism(object):
         elif mode=='hex':
             print([f"{gene:08x}" for gene in self._genome])
 
+    @property   
+    def last_x(self):
+        return self._last_x
+
+    @property
+    def last_y(self):
+        return self._last_y
+
     @property
     def x_pos(self):
         return self._x_pos
@@ -137,7 +145,47 @@ class BaseOrganism(object):
             new_val = self._max_y + (new_val % self._min_y)
         self._last_y = self._y_pos
         self._y_pos = new_val
+
+    @property
+    def last_motion_vector(self):
+        #new_xy_pos = [self.x_pos + total_motion*cos(self.direction), self.y_pos + total_motion*sin(self.direction)]
+        #
+        vel = None 
+        return vel
     
+    @property
+    def direction(self):
+        '''this is the angle or direction of last motion'''
+        # x1, y1 = self.last_x, self.last_y
+        # x2, y2 = self.x_pos, self.y_pos
+        # mag    = self.motion_magnitude
+        # _cos_arg = (x2-x1) / mag
+        # direction = np.arccos(_cos_arg)   #inverse cosine: angle = cos^-1((x2-x1)/mag)
+        _, _, _, direction = self.get_last_motion_vector()
+        return direction
+
+    @property
+    def motion_magnitude(self):
+        '''Use pythagoream theorem to find magnitude of motion vector from last motion'''
+        # x1, y1 = self.last_x, self.last_y
+        # x2, y2 = self.x_pos, self.y_pos
+
+        # mag = np.sqrt((x2-x1)**2 + (y2-y1)**2)
+        _, _, mag, _ = self.get_last_motion_vector()
+        return mag
+
+    def get_last_motion_vector(self):
+        x1, y1 = self.last_x, self.last_y
+        x2, y2 = self.x_pos, self.y_pos
+        
+        origin    = (x1, y1)
+        dest      = (x2, y2)
+        mag       = np.sqrt((x2-x1)**2 + (y2-y1)**2)
+        direction = np.arccos((x2-x1) / mag) 
+        #mag       = self.motion_magnitude
+        #direction = self.direction
+        return (origin, dest, mag, direction)
+
     def update_pos(self, x_delta, y_delta):
         '''update organism's position by adding the change in position to current one'''
         self.x_pos += x_delta
@@ -147,9 +195,13 @@ class BaseOrganism(object):
         self.x_pos = x_pos
         self.y_pos = y_pos
 
-    def set_pos_boundaries(self, min_xy, max_xy):
-        self.max_x, self.max_y = max_xy
-        self.min_x, self.min_y = min_xy
+    def set_pos_boundaries(self, min_x, min_y, max_x, max_y):
+        self.max_x, self.max_y = max_x, max_y
+        self.min_x, self.min_y = min_y, min_y
+
+    def get_pos(self):
+        '''returns tuple of (x,y) position (column,row)'''
+        return self.x_pos, self.y_pos
 #==========================================================
 # Basic Gene 
 class Gene(object):
