@@ -60,13 +60,22 @@ class StomachDecoder(BaseDecoder):
         super().__init__(gene_id=gene_id, name=name)
     def decode(self, gene_value):
         '''
-        0 -> 000 -> sunlight
-        1 -> 001 -> plant
-        2 -> 010 -> meat
+        0 -> 000 -> plant
+        1 -> 001 -> herbivore
+        2 -> 010 -> carnivore
         3 -> 011 -> omnivore
-        4 -> 100 -> everything
         '''
-        attrs = [('food_type','omnivore')]
+        if isinstance(gene_value, str):  #assume it is a string representing a binary number (0's and 1's)
+            gene_value = int(gene_value, 2)   #the 2 indicates that we want to read this string as a base 2 number (binary)
+
+        possible_types = {
+            0: 'plant',
+            1: 'herbivore',
+            2: 'carnivore',
+            3: 'omnivore'
+        }
+        _type_val = gene_value % len(possible_types)   #this resizes the value so that we always get a valid type
+        attrs = [('type', possible_types.get(_type_val, 'plant'))]  #set type from possible type. if it does not exist for some reason, set 'plant' by default
         return attrs
 
 class LungDecoder(BaseDecoder):
@@ -152,7 +161,7 @@ decoder_constructors = [
 
 def construct_decoder_directory(decoder_constructors=decoder_constructors):
     gene_decoders = dict()
-    for gene_id, constructor in enumerate(decoder_constructors, 2):
+    for gene_id, constructor in enumerate(decoder_constructors):
         decoder = constructor(gene_id=gene_id)
         gene_decoders[gene_id] = decoder 
     return gene_decoders
