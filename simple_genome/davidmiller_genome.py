@@ -8,7 +8,7 @@ a couple of helpful functions. This file can help make the code more accessible.
 
 Additionally, I changed a few of the variable names used in the original code
 to better fit with the way I understand the problem. For example, in the C++
-code, `NEURON` refers to the hidden neurons in my code, while sensors and actions 
+code, `NEURON` refers to the hidden neurons in my code, while SENSES and ACTION 
 refer to what I call input and output neurons, respectively.
 """
 
