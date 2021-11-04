@@ -1,3 +1,12 @@
+"""
+The main functionality for creating a neural network was taken from
+David Miller's Github code on:
+https://github.com/davidrmiller/biosim4/blob/main/src/genome.cpp
+
+The original code is in C++ and I did my best to translate and adapt the 
+code to my needs in Python.
+"""
+
 import numpy as np
 from basic_types import Connection, Neuron
 from neural_net import NeuralNet
