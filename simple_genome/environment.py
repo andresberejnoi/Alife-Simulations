@@ -1,4 +1,4 @@
-from tools import make_random_genome
+from tools import make_random_genome, show_org_info
 import numpy as np
 
 class World(object):
@@ -205,9 +205,22 @@ class Simulation(object):
             for t_step in range(self.spg):
                 print(f"timestep: {t_step} of generation: {gen}") if t_step % 10 == 0 else None
                 self.advance_simulation()
+            
+        
+        print(f"Ended in Generation {gen}, timestep: {t_step}")
 
+    def fast_start(self):
+        #----Initialize Population based on parameters
+        self.populate_world(self.init_population)
+        for gen in range(self.num_gens):
+            print(f"Starting Generation {gen}") if gen % 1 == 0 else None
+            for t_step in range(self.spg):
+                print(f"timestep: {t_step} of generation: {gen}") if t_step % 10 == 0 else None
+                self.fast_advance_simulation()
+        print(f"Ended in Generation {gen}, timestep: {t_step}")
 
     def populate_world(self, init_population=20):
+        '''This will populate the organisms in the world'''
         self.population.clear()
         assert(init_population <= self.max_population)
         assert(init_population <= (self.width * self.height))
@@ -240,17 +253,11 @@ class Simulation(object):
                 actions = org.think()   #make organism think
             except IndexError as e:
                 print(f"\n{'-'*80}\n{e}")
-                new_line = '\\n'
-                print(f"\n* Index Error (org idx={i}) was caused by Org:\n{org}" +\
-                      f"\n* Neural net:\n{org.nnet}" +\
-                      f"\n* Neurons:\n{new_line.join([str(neuron) for neuron in org.nnet.neurons])}" +\
-                      f"\n* Connections:\n{new_line.join([str(conn) for conn in org.nnet.connections])}" +\
-                      f"\n* Output Accumulator:\n{org.nnet.neuron_accumulators}") 
-            #actions = org.think()   #make organism think
-
-            #compute_next_params()
-            #check for collisions and prepare new positions (inspired by (line 79): https://github.com/rafael-fuente/Ideal-Gas-Simulation-To-Verify-Maxwell-Boltzmann-distribution/blob/6e87568cb6103a391c6098d447142a74611674c4/Ideal%20Gas%20simulation%20code.py#L79)
-            
+                print(f"\n* Index Error (org idx={i}) was caused by Org:\n{org}")
+                show_org_info(org)
+                print("\n-> Exiting in shame...")
+                import sys
+                sys.exit()  
             
     def detect_collisions(self, org, list_of_others):
         collisions = []
@@ -263,3 +270,90 @@ class Simulation(object):
             if this_pos==other_pos:
                 collisions.append(other)
         return collisions
+
+    def fast_advance_simulation(self):
+        '''Computes all the changes for the next cycle'''
+        for i, org in enumerate(self.population):
+            #TODO: first detect collisions with every other organism and the environment (create a list of changes to params)
+            #remaining_orgs = self.population[:i] + self.population[i+1:]
+            collisions = self.fast_detect_collisions(i)
+
+            #TODO: 
+            try:
+                actions = org.think()   #make organism think
+            except IndexError as e:
+                print(f"\n{'-'*80}\n{e}")
+                print(f"\n* Index Error (org idx={i}) was caused by Org:\n{org}")
+                show_org_info(org)
+                print("\n-> Exiting in shame...")
+                import sys
+                sys.exit()
+
+    def fast_detect_collisions(self, org_idx):
+        collisions = []
+        #org = self.population[org_idx]
+        for i in range(len(self.population)):
+            if i==org_idx: continue    #jump to the next iteration if i is the org with are comparing against
+            #other = self.population[i]
+
+            #if org.get_pos() == other.get_pos():
+            if self.population[org_idx].get_pos() == self.population[i].get_pos():
+                collisions.append(self.population[i])
+        return collisions
+
+def sample_run():
+
+    decoders = construct_decoder_directory()
+    config = get_settings_from_file()
+
+    num_genes       = 20
+    num_brain_conns = 30
+    num_senses      = 20
+    num_outputs     = 20
+
+    gene_length           = config['phenotype_genome']['gene_length']
+    mutation_rate         = config['mutation']['point_mutation_rate']
+    gene_duplication_rate = config['mutation']['gene_duplication_rate']
+    marker_genes_dict     = config['marker_genes']
+
+    brain_params = config['brain_genome']
+    brain_params['num_outputs'] = num_outputs
+    brain_params['num_senses']  = num_senses
+
+    pheno_params = config['phenotype_genome']
+    pheno_params['gene_decoders'] = decoders
+
+    factory = Factory(gene_length           = gene_length,
+                      phenotype_params      = pheno_params,
+                      brain_params          = brain_params,
+                      marker_genes_dict     = marker_genes_dict,
+                      point_mutation_rate   = mutation_rate,
+                      gene_duplication_rate = gene_duplication_rate,)
+
+
+    w = h    = 500
+    init_pop = 1000
+    num_gens = 2
+    steps_per_gen = 2
+
+    sim = Simulation(w, h, factory=factory, max_population=10_000, init_population=init_pop, num_generations=num_gens, steps_per_generation=steps_per_gen)
+    
+    start_t = time.time()
+    sim.start()
+    end_t   = time.time()
+
+    total_s = end_t - start_t
+    
+    print(f"\nSimulation completed (Total time: {total_s // 60:.0f} m + {total_s % 60:.2f}s)")
+    print(f"\n\t* Generations: {num_gens}\n\t* Steps per generation: {steps_per_gen}")
+
+if __name__ == '__main__':
+    from full_factory import Factory
+    from tools import get_settings_from_file, make_random_genome
+    from decoders import construct_decoder_directory
+    from environment import World, Simulation
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import time 
+
+    sample_run()
