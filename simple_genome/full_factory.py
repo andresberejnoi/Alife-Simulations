@@ -3,8 +3,37 @@ from brain_factory import BrainFactory
 from phenotype_factory import PhenotypeFactory
 from genome import Genome 
 from basic_types import MutationChange
+from tools import get_settings_from_file
 import numpy as np 
 
+
+def make_factory_from_config(config_filename=None, decoders={}):
+    config = get_settings_from_file(config_filename)
+
+    num_genes       = 20
+    num_brain_conns = 30
+    num_senses      = 20
+    num_outputs     = 20
+
+    gene_length           = config['phenotype_genome']['gene_length']
+    mutation_rate         = config['mutation']['point_mutation_rate']
+    gene_duplication_rate = config['mutation']['gene_duplication_rate']
+    marker_genes_dict     = config['marker_genes']
+
+    brain_params = config['brain_genome']
+    brain_params['num_outputs'] = num_outputs
+    brain_params['num_senses']  = num_senses
+
+    pheno_params = config['phenotype_genome']
+    pheno_params['gene_decoders'] = decoders
+
+    factory = Factory(gene_length           = gene_length,
+                  phenotype_params      = pheno_params,
+                  brain_params          = brain_params,
+                  marker_genes_dict     = marker_genes_dict,
+                  point_mutation_rate   = mutation_rate,
+                  gene_duplication_rate = gene_duplication_rate,)
+    return factory
 
 class Factory(object):
     def __init__(self, gene_length     = 32, 
@@ -62,7 +91,7 @@ class Factory(object):
 
         org        = self.phenotype_factory.create_organism_from_genome(pheno_genome)
         org.nnet   = self.brain_factory.create_brain_from_genome(brain_genome)
-        org.genome = genome
+        org.genome = [gene for gene in genome]    #TODO: I think I need this to make sure each organism has its own genome and not a reference to someone else's
         return org
 
     #======================MUTATIONS========================
