@@ -17,6 +17,7 @@ brain_genome:
     - 16 #weight_length
 
 mutation:
+  point_mutation_flips  : 1       #how many bits are flipped for a single point mutation (I guess technically it would not be a point mutation with more than 1, but it is what it is)
   point_mutation_rate   : 0.01    #1 in 100
   gene_duplication_rate : 0.005   #1 in 200
 
