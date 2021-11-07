@@ -40,6 +40,9 @@ class NeuralNet(object):
             that takes standard parameters, as defined by the
             project description.
         '''
+        if not self._container_vectors_exist:
+            self.set_up_container_vectors()
+            
         num_neurons = self.num_hidden
         self.output_vector.fill(0)           #reset the vector to zero
         self.neuron_accumulators.fill(0)     #reset vector to zero
