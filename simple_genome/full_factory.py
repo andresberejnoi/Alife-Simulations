@@ -35,7 +35,7 @@ def make_factory_from_config(config_filename=None, decoders={}):
                   num_brain_conns       = num_brain_conns,
                   point_mutation_rate   = mutation_rate,
                   gene_duplication_rate = gene_duplication_rate,)
-    return factory
+    return factory, config
 
 class Factory(object):
     def __init__(self, gene_length     = 32, 
@@ -53,6 +53,9 @@ class Factory(object):
         self.START_BRAIN_MARKER = marker_genes_dict.get('start_brain_marker', 0x1)
         self.END_BRAIN_MARKER   = marker_genes_dict.get('end_brain_marker', 0x0)
         self.marker_genes = [self.START_BRAIN_MARKER, self.END_BRAIN_MARKER]
+
+        self.num_pheno_genes = num_pheno_genes
+        self.num_brain_conns = num_brain_conns
 
         self.point_mutation_rate   = point_mutation_rate
         self.gene_duplication_rate = gene_duplication_rate
