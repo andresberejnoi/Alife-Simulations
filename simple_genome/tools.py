@@ -9,7 +9,7 @@ def get_settings_from_file(filename=''):
         f_handler = open(filename)
     except (FileNotFoundError, TypeError) as e:
         f_handler = open(default_file)
-        print(f"* Error:\n{e}\n\t* Could not open provided filename: {filename}.\n\t-> Opening default file instead: {default_file}")
+        #print(f"* Error:\n{e}\n\t* Could not open provided filename: {filename}.\n\t-> Opening default file instead: {default_file}")
     config = yaml.safe_load(f_handler)
     f_handler.close()
     return config
@@ -18,15 +18,21 @@ def make_random_genome(num_genes,
                        num_brain_connections,
                        gene_length=32,
                        start_brain_marker=0x1,
-                       end_brain_marker=0x0):
+                       end_brain_marker=0x0,
+                       rng=None):
     
     data_type   = getattr(np, f"uint{gene_length}", np.uint32)
     low         = np.iinfo(data_type).min
     high        = np.iinfo(data_type).max
+
+    if rng is None:
+        rng = np.random.default_rng()
     
-    pheno_genes = np.random.randint(low, high, size=num_genes, dtype=data_type) 
-    brain_genes = np.random.randint(low, high, size=num_brain_connections+2, dtype=data_type)  #+2 to account for marker genes 
-    
+    #pheno_genes = np.random.randint(low, high, size=num_genes, dtype=data_type) 
+    #brain_genes = np.random.randint(low, high, size=num_brain_connections+2, dtype=data_type)  #+2 to account for marker genes 
+    pheno_genes = rng.integers(low, high, size=num_genes, dtype=data_type)
+    brain_genes = rng.integers(low, high, size=num_brain_connections+2, dtype=data_type)    #+2 to account for marker genes 
+
     brain_genes[0]  = start_brain_marker
     brain_genes[-1] = end_brain_marker
 
@@ -187,3 +193,22 @@ def show_two_orgs(org1, org2):
 
     print(f"\n{'Genome Org2 (list form) (' + str(len(org2.genome)) + '):'}")
     print(f"\n{org2.genome}")
+
+#TODO: this function below needs polishing. It was copied directly from a Jupyter notebook with no changes
+#TODO: right now the function can swap the position of org1 and org2 depending on which one is longer. I would prefer it to maintain positions
+def print_two_orgs_attributes(org1, org2):
+    ""
+    atts1 = {at:i for i,at in enumerate(dir(org1))}
+    atts2 = {at:i for i,at in enumerate(dir(org2))}
+
+    top_len = len(atts1) if len(atts1) >= len(atts2) else len(atts2)
+    longest  = atts1 if len(atts1) >= len(atts2) else atts2
+    shortest = atts2 if len(atts2) > len(atts1) else atts1
+
+    side_len = 25
+    print(f"{'Atts Org1':^{side_len}} | {'Atts Org2':^{side_len}}\n{'-'*((side_len*2)+3)}")
+    for key in longest:
+        if key.startswith('_'):
+            continue
+        s_key = key if key in shortest else None
+        print(f"{key:^{side_len}} | {s_key:^{side_len}}")
