@@ -180,8 +180,8 @@ class Simulation(object):
                  init_population=50, 
                  max_population=200, 
                  factory=None, 
-                 num_generations      = 100,
-                 steps_per_generation = 300):
+                 num_generations      = 1,
+                 steps_per_generation = 5):
 
         self.width           = width
         self.height          = height
