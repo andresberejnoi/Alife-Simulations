@@ -10,8 +10,8 @@ import numpy as np
 def make_factory_from_config(config_filename=None, decoders={}):
     config = get_settings_from_file(config_filename)
 
-    num_genes       = 20
-    num_brain_conns = 30
+    num_genes       = config['simulation']['num_pheno_genes']
+    num_brain_conns = config['simulation']['num_brain_conns']
     num_senses      = 20
     num_outputs     = 20
 
@@ -27,10 +27,12 @@ def make_factory_from_config(config_filename=None, decoders={}):
     pheno_params = config['phenotype_genome']
     pheno_params['gene_decoders'] = decoders
 
-    factory = Factory(gene_length           = gene_length,
+    factory = Factory(gene_length       = gene_length,
                   phenotype_params      = pheno_params,
                   brain_params          = brain_params,
                   marker_genes_dict     = marker_genes_dict,
+                  num_pheno_genes       = num_genes,
+                  num_brain_conns       = num_brain_conns,
                   point_mutation_rate   = mutation_rate,
                   gene_duplication_rate = gene_duplication_rate,)
     return factory
@@ -40,6 +42,8 @@ class Factory(object):
                  phenotype_params      = {},
                  brain_params          = {},
                  marker_genes_dict     = {},
+                 num_pheno_genes       = 10,
+                 num_brain_conns       = 15,
                  point_mutation_rate   = 0.01,
                  gene_duplication_rate = 0.005,):
 
@@ -66,8 +70,8 @@ class Factory(object):
         be traversed many more times using this method. I will check later
         if performance is an issue.
         '''
-        pheno_genome = Genome(gene_length=self.GENE_LENGTH)
-        brain_genome = Genome(gene_length=self.GENE_LENGTH)
+        pheno_genome = []    #Genome(gene_length=self.GENE_LENGTH)
+        brain_genome = []    #Genome(gene_length=self.GENE_LENGTH)
 
         brain_mode = False 
         for gene in genome:
@@ -94,8 +98,12 @@ class Factory(object):
         return org
 
     #======================MUTATIONS========================
-    def apply_point_mutations(self, genome, num_mutations=1, num_flips=1, 
-                              use_genome_copy=False, protect_guards=True,
+    def apply_point_mutations(self, 
+                              genome, 
+                              num_mutations=1, 
+                              num_flips=1, 
+                              use_genome_copy=False, 
+                              protect_guards=True,
                               prevent_repeated_mutations=True):
         '''Randomly applies a mutation masks to a random gene or genes (each mutation mask
         will be randomly generated for each gene to mutate).
