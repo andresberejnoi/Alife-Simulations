@@ -279,16 +279,7 @@ class BrainFactory(object):
 
         return num_inputs, num_hidden, num_outputs
 
-    def create_brain_from_genome(self, genome, remove_floating_hidden_neurons=None):
-        remove_floating_hidden_neurons = remove_floating_hidden_neurons or self.remove_floating_hidden_neurons
-
-        node_dict = {}
-        connection_list            = self.build_connection_list(genome)
-        connection_list            = self.make_renumbered_connection_list(connection_list)
-
-        node_dict                  = self.make_node_list(node_dict, connection_list)
-        node_dict, connection_list = self.cull_useless_neurons(node_dict, connection_list, remove_floating_hidden_neurons)
-        
+    def make_neural_net(self, node_dict, connection_list):
         nnet = NeuralNet()
 
         #remap each neuron so their ids start from 0 and increase sequentially with no gaps
@@ -341,4 +332,18 @@ class BrainFactory(object):
 
         #----Setup container vectors for the network to use during backpropagation
         nnet.set_up_container_vectors()
+        return nnet
+
+
+    def create_brain_from_genome(self, genome, remove_floating_hidden_neurons=None):
+        remove_floating_hidden_neurons = remove_floating_hidden_neurons or self.remove_floating_hidden_neurons
+
+        node_dict = {}
+        connection_list            = self.build_connection_list(genome)
+        connection_list            = self.make_renumbered_connection_list(connection_list)
+
+        node_dict                  = self.make_node_list(node_dict, connection_list)
+        node_dict, connection_list = self.cull_useless_neurons(node_dict, connection_list, remove_floating_hidden_neurons)
+        
+        nnet                       = self.make_neural_net(node_dict=node_dict, connection_list=connection_list)
         return nnet
