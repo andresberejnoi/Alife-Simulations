@@ -9,7 +9,7 @@ def get_settings_from_file(filename=''):
         f_handler = open(filename)
     except (FileNotFoundError, TypeError) as e:
         f_handler = open(default_file)
-        #print(f"* Error:\n{e}\n\t* Could not open provided filename: {filename}.\n\t-> Opening default file instead: {default_file}")
+        print(f"-> Could not open provided filename: {filename}. Opening default file instead: {default_file}")
     config = yaml.safe_load(f_handler)
     f_handler.close()
     return config
