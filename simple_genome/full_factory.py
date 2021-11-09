@@ -88,9 +88,8 @@ class Factory(object):
         #first create the organism and then the brain, although
         # any order should work, I think...
         pheno_genome, brain_genome = self._separate_genomes(genome)
-
         org        = self.phenotype_factory.create_organism_from_genome(pheno_genome)
-        org.nnet   = self.brain_factory.create_brain_from_genome(brain_genome)
+        org.nnet   = self.brain_factory.create_brain_from_genome(brain_genome,)
         org.genome = [gene for gene in genome]    #TODO: I think I need this to make sure each organism has its own genome and not a reference to someone else's
         return org
 
