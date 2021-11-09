@@ -9,6 +9,7 @@ phenotype_genome:
 brain_genome:
   gene_length: 32
   max_hidden_neurons: 128    #can't go more than 128 with 7 bits, unless the lengths are changed below...
+  remove_floating_hidden_neurons: False
   section_lengths:
     - 1  #source_layer_length
     - 7  #source_neuron_length
