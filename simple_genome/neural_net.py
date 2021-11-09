@@ -19,8 +19,9 @@ class NeuralNet(object):
         return f"<NeuralNet: num_connections={len(self.connections):>3} | num_hidden_neurons={self.num_hidden:>3}>"
         
     def set_up_container_vectors(self):
-        self.output_vector = np.zeros(shape=self.num_outputs)
+        self.output_vector       = np.zeros(shape=self.num_outputs)
         self.neuron_accumulators = np.zeros(shape=self.num_hidden)
+        
         self._container_vectors_exist = True
 
     @property 
