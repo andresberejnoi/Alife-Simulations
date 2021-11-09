@@ -29,4 +29,8 @@ marker_genes:
 
 simulation:
   steps_per_generation: 300
+  num_pheno_genes     : 10
+  num_brain_conns     : 15
+
+random_seed: 2021   #this parameter is not used yet, but I'm thinking that it will be good to have it for later, to add repeatability to the simulation
   
