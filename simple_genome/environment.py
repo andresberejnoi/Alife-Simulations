@@ -229,8 +229,9 @@ class Simulation(object):
         self.world.clear_grids()
         empty_spots = self.world.get_random_empty_spots(init_population)
         #assert(len(empty_spots) == init_population)
+        rng = np.random.default_rng()
         for i in range(init_population):
-            genome = make_random_genome(num_genes=10, num_brain_connections=25)
+            genome = make_random_genome(num_genes=10, num_brain_connections=15, rng=rng)
 
             min_x, min_y = 0, 0
             max_x, max_y = self.width, self.height
