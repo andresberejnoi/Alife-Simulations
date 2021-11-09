@@ -1,9 +1,9 @@
 import numpy as np
 
 class NeuralNet(object):
-    def __init__(self, connections=[], neurons=[], activation_func=np.tanh, num_senses=30, num_outputs=30):
-        self.connections = connections
-        self.neurons     = neurons
+    def __init__(self, activation_func=np.tanh, num_senses=30, num_outputs=30):
+        self.connections = []
+        self.neurons     = []
         self.activ_func  = activation_func
 
         self.num_senses  = num_senses
@@ -21,7 +21,7 @@ class NeuralNet(object):
     def set_up_container_vectors(self):
         self.output_vector       = np.zeros(shape=self.num_outputs)
         self.neuron_accumulators = np.zeros(shape=self.num_hidden)
-        
+
         self._container_vectors_exist = True
 
     @property 
