@@ -31,6 +31,11 @@ simulation:
   steps_per_generation: 300
   num_pheno_genes     : 10
   num_brain_conns     : 15
+  world_width         : 100
+  world_height        : 100
+  init_population     : 500
+  num_generations     : 5
+  num_steps_per_gen   : 100
 
 random_seed: 2021   #this parameter is not used yet, but I'm thinking that it will be good to have it for later, to add repeatability to the simulation
   
