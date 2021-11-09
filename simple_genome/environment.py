@@ -201,8 +201,10 @@ class Simulation(object):
         #----Initialize Population based on parameters
         self.populate_world(self.init_population)
         for gen in range(self.num_gens):
+            self.cur_gen = gen  #there might be a more elegant way to keep global track of the timestep and generation number
             print(f"Starting Generation {gen}") if gen % 1 == 0 else None
             for t_step in range(self.spg):
+                self.cur_t_step = t_step
                 print(f"timestep: {t_step} of generation: {gen}") if t_step % 10 == 0 else None
                 self.advance_simulation()
             
@@ -253,6 +255,7 @@ class Simulation(object):
                 actions = org.think()   #make organism think
             except IndexError as e:
                 print(f"\n{'-'*80}\n{e}")
+                print(f"-> Error at generation={self.cur_gen}, timestep={self.cur_t_step}")
                 print(f"\n* Index Error (org idx={i}) was caused by Org:\n{org}")
                 show_org_info(org)
                 print("\n-> Exiting in shame...")
@@ -306,8 +309,8 @@ def sample_run():
     decoders = construct_decoder_directory()
     config = get_settings_from_file()
 
-    num_genes       = 20
-    num_brain_conns = 30
+    num_genes       = 15
+    num_brain_conns = 15
     num_senses      = 20
     num_outputs     = 20
 
@@ -332,7 +335,7 @@ def sample_run():
 
 
     w = h    = 500
-    init_pop = 1000
+    init_pop = 10
     num_gens = 2
     steps_per_gen = 2
 
