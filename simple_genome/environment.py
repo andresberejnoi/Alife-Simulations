@@ -195,9 +195,6 @@ class Simulation(object):
         self.spg             = steps_per_generation   #I could make this name more explicit
 
     def start(self):
-        #self.current_gen = 0   #generation number
-        #self.t_step      = 0   #timestep for current generation
-
         #----Initialize Population based on parameters
         self.populate_world(self.init_population)
         for gen in range(self.num_gens):
@@ -207,8 +204,6 @@ class Simulation(object):
                 self.cur_t_step = t_step
                 print(f"timestep: {t_step} of generation: {gen}") if t_step % 10 == 0 else None
                 self.advance_simulation()
-            
-        
         print(f"Ended in Generation {gen}, timestep: {t_step}")
 
     def fast_start(self):
