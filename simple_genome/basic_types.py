@@ -29,8 +29,6 @@ class Neuron(object):
     def __init__(self, neuron_id=None, neuron_type='',):
         self.type = neuron_type
         self.id   = neuron_id
-        self.output_connections = []
-        self.input_connections  = []
         self._output = 0.0
         self.num_outputs = 0
         self.num_self_inputs = 0
