@@ -71,5 +71,4 @@ DEFAULT_INPUT_NEURONS = [
     'neighbor_dir_x',
     'neighbor_dir_y',
     'neighbor_distance'
-
 ]

@@ -156,7 +156,6 @@ decoder_constructors = [
     SkinColorGreenDecoder,
     SkinColorBlueDecoder,
     SkinAlphaDecoder,
-
 ]
 
 def construct_decoder_directory(decoder_constructors=decoder_constructors):

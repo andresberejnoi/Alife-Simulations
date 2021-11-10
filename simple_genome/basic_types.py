@@ -178,7 +178,7 @@ class BaseOrganism(object):
         
         origin    = (x1, y1)
         dest      = (x2, y2)
-        mag       = np.sqrt((x2-x1)**2 + (y2-y1)**2)
+        mag       = np.sqrt((x2-x1)**2 + (y2-y1)**2) #vector magnitude
         direction = np.arccos((x2-x1) / mag) 
         #mag       = self.motion_magnitude
         #direction = self.direction
