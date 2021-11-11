@@ -206,16 +206,6 @@ class Simulation(object):
                 self.advance_simulation()
         print(f"Ended in Generation {gen}, timestep: {t_step}")
 
-    def fast_start(self):
-        #----Initialize Population based on parameters
-        self.populate_world(self.init_population)
-        for gen in range(self.num_gens):
-            print(f"Starting Generation {gen}") if gen % 1 == 0 else None
-            for t_step in range(self.spg):
-                print(f"timestep: {t_step} of generation: {gen}") if t_step % 10 == 0 else None
-                self.fast_advance_simulation()
-        print(f"Ended in Generation {gen}, timestep: {t_step}")
-
     def populate_world(self, init_population=20):
         '''This will populate the organisms in the world'''
         self.population.clear()
@@ -242,6 +232,13 @@ class Simulation(object):
     def advance_simulation(self):
         '''Computes all the changes for the next cycle'''
         for i, org in enumerate(self.population):
+            #TODO: get sensor readings from org
+            #TODO: perform feedforward propagation of org's neural net
+            #TODO: Use output from neural net to perform actions (motions and changes to the environment will be queued to the end of the timestep)
+
+            #TODO: detect collisions between this org and the rest (it might need to work together with the previous step)
+            #TODO: apply all world changes at the end of timestep
+
             #TODO: first detect collisions with every other organism and the environment (create a list of changes to params)
             remaining_orgs = self.population[:i] + self.population[i+1:]
             collisions = self.detect_collisions(org, remaining_orgs)
@@ -268,36 +265,6 @@ class Simulation(object):
 
             if this_pos==other_pos:
                 collisions.append(other)
-        return collisions
-
-    def fast_advance_simulation(self):
-        '''Computes all the changes for the next cycle'''
-        for i, org in enumerate(self.population):
-            #TODO: first detect collisions with every other organism and the environment (create a list of changes to params)
-            #remaining_orgs = self.population[:i] + self.population[i+1:]
-            collisions = self.fast_detect_collisions(i)
-
-            #TODO: 
-            try:
-                actions = org.think()   #make organism think
-            except IndexError as e:
-                print(f"\n{'-'*80}\n{e}")
-                print(f"\n* Index Error (org idx={i}) was caused by Org:\n{org}")
-                show_org_info(org)
-                print("\n-> Exiting in shame...")
-                import sys
-                sys.exit()
-
-    def fast_detect_collisions(self, org_idx):
-        collisions = []
-        #org = self.population[org_idx]
-        for i in range(len(self.population)):
-            if i==org_idx: continue    #jump to the next iteration if i is the org with are comparing against
-            #other = self.population[i]
-
-            #if org.get_pos() == other.get_pos():
-            if self.population[org_idx].get_pos() == self.population[i].get_pos():
-                collisions.append(self.population[i])
         return collisions
 
 def sample_run():
