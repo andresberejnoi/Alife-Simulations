@@ -210,6 +210,7 @@ class BaseOrganism(object):
         x2, y2 = other_org.get_pos()
 
         dist = np.sqrt((x2-x1)**2 + (y2-y1)**2)
+        #dist = np.linalg.norm(np.array([x1,y1]) - np.array([x2,y2]))
         return dist
 
     def update_pos(self, x_delta, y_delta):
