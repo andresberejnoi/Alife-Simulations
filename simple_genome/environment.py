@@ -254,8 +254,15 @@ class Simulation(object):
                 print("\n-> Exiting in shame...")
                 import sys
                 sys.exit()  
+
+    def _advance_simulation(self):
+        for i, org in enumerate(self.population):
+            colliding_org = self.detect_first_collision(org, i)
+
+            #allow organism to think, based on sensor data
+
             
-    def detect_collisions(self, org, org_idx):
+    def _detect_collisions(self, org, org_idx):
         collisions = []
         for other in self.population[org_idx+1:]:
             #this_x, this_y   = org.get_pos()
@@ -266,6 +273,27 @@ class Simulation(object):
             if this_pos==other_pos:
                 collisions.append(other)
         return collisions
+    
+    def detect_collisions(self, org, org_idx):
+        x, y   = org.get_pos()
+        radius = 1
+        local_grid = self.world.get_surroundings(x, y, radius)
+        
+    def detect_first_collision(self, org, org_idx):
+        '''Similar to detect_collision, but it returns 
+        the first colliding object it finds and ignores the rest.
+        It is not a perfect solution, but for now my program can only deal 
+        with two organisms interacting at the same time'''
+        for other in self.population[org_idx+1:]:
+            #this_pos  = org.get_pos()
+            #other_pos = other.get_pos()
+            #if this_pos == other_pos:
+            #    return other
+            dist = org.get_distance(other)
+            if dist <=1:
+                return other
+            
+        return None  #we only get here if there are no collisions
 
 def sample_run():
 
