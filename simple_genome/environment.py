@@ -240,8 +240,8 @@ class Simulation(object):
             #TODO: apply all world changes at the end of timestep
 
             #TODO: first detect collisions with every other organism and the environment (create a list of changes to params)
-            remaining_orgs = self.population[:i] + self.population[i+1:]
-            collisions = self.detect_collisions(org, remaining_orgs)
+            #remaining_orgs = self.population[:i] + self.population[i+1:]
+            collisions = self.detect_collisions(org, i)
 
             #TODO: 
             try:
@@ -255,9 +255,9 @@ class Simulation(object):
                 import sys
                 sys.exit()  
             
-    def detect_collisions(self, org, list_of_others):
+    def detect_collisions(self, org, org_idx):
         collisions = []
-        for other in list_of_others:
+        for other in self.population[org_idx+1:]:
             #this_x, this_y   = org.get_pos()
             #other_x, other_y = other.get_pos()
             this_pos  = org.get_pos()   #-> (x,y) tuple
