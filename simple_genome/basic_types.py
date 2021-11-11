@@ -1,5 +1,6 @@
 from genome import Genome    #It does not look good. I keep importing this into every file. Maybe it should be a basic type
 import numpy as np
+import yaml
 #==============================================================================================
 # Brain related classes
 class Connection(object):
@@ -59,6 +60,9 @@ class BaseOrganism(object):
 
         self._x_pos, self._y_pos   = x_pos, y_pos
         self._last_x, self._last_y = x_pos, y_pos
+
+        self._next_x = x_pos 
+        self._next_y = y_pos
     
     @property
     def max_x(self):
@@ -145,6 +149,22 @@ class BaseOrganism(object):
         self._y_pos = new_val
 
     @property
+    def next_x(self):
+        return self._next_x
+
+    @property
+    def next_y(self, new_val):
+        self._next_x = new_val
+
+    @next_x.setter
+    def next_y(self, new_val):
+        self._next_y = new_val
+
+    @next_y.setter
+    def next_y(self):
+        return self._next_y
+
+    @property
     def last_motion_vector(self):
         #new_xy_pos = [self.x_pos + total_motion*cos(self.direction), self.y_pos + total_motion*sin(self.direction)]
         #
@@ -184,6 +204,14 @@ class BaseOrganism(object):
         #direction = self.direction
         return (origin, dest, mag, direction)
 
+    def get_distance(self, other_org):
+        '''returns distance to other_org using Pythagorean's Theorem'''
+        x1, y1 = self.get_pos()
+        x2, y2 = other_org.get_pos()
+
+        dist = np.sqrt((x2-x1)**2 + (y2-y1)**2)
+        return dist
+
     def update_pos(self, x_delta, y_delta):
         '''update organism's position by adding the change in position to current one'''
         self.x_pos += x_delta
@@ -200,6 +228,14 @@ class BaseOrganism(object):
     def get_pos(self):
         '''returns tuple of (x,y) position (column,row)'''
         return self.x_pos, self.y_pos
+
+    def get_next_pos(self):
+        return self.next_x, self.next_y
+
+    def set_next_pos(self, x, y):
+        self.next_x = x
+        self.next_y = y
+    
 #==========================================================
 # Basic Gene 
 class Gene(object):
@@ -221,3 +257,26 @@ class MutationChange(object):
                f"\t{self.mutation_mask:032b} -> bits flipped\n"  +\
                f"\t{'|'*32}\n" +\
                f"\t{self.changed_gene:032b} -> result\n"
+
+#===================================================
+#---------------Configuration File Class
+
+class ConfigurationSettings(object):
+    DEFAULT_FILE = "default_config.yml"
+    def __init__(self, config_filename):
+        '''
+        config_filename: str
+            Filename of configuration file (yaml format)    
+        '''
+        self.filename = config_filename
+
+    def _parse_config_file(self):
+        try:
+            f_handler = open(self.filename)
+
+        except (FileNotFoundError, TypeError) as e:
+            print(f"Given filename `{self.filename}` could not be loaded. Loading default file: `{self.DEFAULT_FILE}`")
+            f_handler = open(self.DEFAULT_FILE)
+
+        config = yaml.safe_load(f_handler)
+        f_handler.close()
