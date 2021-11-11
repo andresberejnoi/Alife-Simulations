@@ -204,8 +204,16 @@ class BaseOrganism(object):
         #direction = self.direction
         return (origin, dest, mag, direction)
 
-    def get_distance(self, other_org):
-        '''returns distance to other_org using Pythagorean's Theorem'''
+    def _TODO_get_distance(self, other_org, mode='discrete'):
+        '''Finds distance between this org and other_org'''
+        if mode=='discrete':
+            dist = self._get_discrete_distance(other_org)
+        elif mode=='continuous':
+            dist = self._get_pythagorean_distance(other_org)
+        return dist
+
+    def _get_pythagorean_distance(self, other_org):
+        '''returns distance to other_org using Pythagorean's Theorem (for continuous spaces'''
         x1, y1 = self.get_pos()
         x2, y2 = other_org.get_pos()
 
@@ -213,7 +221,17 @@ class BaseOrganism(object):
         #dist = np.linalg.norm(np.array([x1,y1]) - np.array([x2,y2]))
         return dist
 
-    def update_pos(self, x_delta, y_delta):
+    def get_distance(self, other_org):
+        '''Computes distance between this and other_org in a discrete 2D grid. 
+        All surrounding cells to a cell are a distance of 1, even diagonals'''
+        x1, y1 = self.get_pos()
+        x2, y2 = other_org.get_pos()
+
+        dx = abs(x1 - x2)
+        dy = abs(y1 - y2)
+        return max([dx,dy])
+
+    def update_pos(self, x_delta=0, y_delta=0):
         '''update organism's position by adding the change in position to current one'''
         self.x_pos += x_delta
         self.y_pos += y_delta
