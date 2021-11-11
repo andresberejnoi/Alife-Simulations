@@ -89,7 +89,7 @@ class SpeedDecoder(BaseDecoder):
     def __init__(self, gene_id=None, name='Speed'):
         super().__init__(gene_id=gene_id, name=name)
     def decode(self, gene_value):
-        attrs=[('max_speed', 100)]
+        attrs=[('max_speed', 1)]
         return attrs
 
 class GrowthDecoder(BaseDecoder):
