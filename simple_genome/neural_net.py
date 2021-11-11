@@ -4,6 +4,7 @@ class NeuralNet(object):
     def __init__(self, activation_func=np.tanh, num_senses=30, num_outputs=30):
         self.connections = []
         self.neurons     = []
+        #self.active_outputs = set()     #indexes of the active output neurons. It is a set to prevent repeated indexes
         self.activ_func  = activation_func
 
         self.num_senses  = num_senses
@@ -23,6 +24,13 @@ class NeuralNet(object):
         self.neuron_accumulators = np.zeros(shape=self.num_hidden)
 
         self._container_vectors_exist = True
+
+    def set_active_outputs(self):
+        self.active_outputs = []
+        for conn in self.connections:
+            if conn.target_type=='output':
+                if conn.target_id not in self.active_outputs:
+                    self.active_outputs.append(conn.target_id)
 
     @property 
     def num_hidden(self):
