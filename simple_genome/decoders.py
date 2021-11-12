@@ -143,6 +143,8 @@ class SkinAlphaDecoder(BaseDecoder):
     def __init__(self, gene_id=None, name='skin_alpha'):
         super().__init__(gene_id=gene_id, name=name)
     def decode(self, gene_value):
+        if isinstance(gene_value, str):
+            gene_value = int(gene_value, 2)   #in case we get a binary string, convert it back into an int
         max_val = int('1'*10, 2)    #max possible value on a 24-bit value field (this does not currently check if this bit number is correct. It depends on the Phenotype factory)
         alpha   = min([(gene_value / max_val), 1])   #this will return 1 at most in case the number happens to be higher 
 
