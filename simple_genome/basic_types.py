@@ -223,7 +223,8 @@ class BaseOrganism(object):
 
     def get_distance(self, other_org):
         '''Computes distance between this and other_org in a discrete 2D grid. 
-        All surrounding cells to a cell are a distance of 1, even diagonals'''
+        All surrounding cells to a cell are a distance of 1, even diagonals
+        This algorithm was taken from here: https://stackoverflow.com/questions/61639509/how-to-compute-distance-between-cells-in-a-2d-grid-on-python'''
         x1, y1 = self.get_pos()
         x2, y2 = other_org.get_pos()
 
@@ -288,8 +289,9 @@ class ConfigurationSettings(object):
             Filename of configuration file (yaml format)    
         '''
         self.filename = config_filename
+        self._parse_config_file()
 
-    def _parse_config_file(self):
+    def _open_config_file(self):
         try:
             f_handler = open(self.filename)
 
@@ -299,3 +301,22 @@ class ConfigurationSettings(object):
 
         config = yaml.safe_load(f_handler)
         f_handler.close()
+
+    
+    def _parse_config_file(self):
+        config = self._open_config_file()
+
+        self.gene_length = config['phenotype_genome']['gene_length']
+        self.num_generations = config['simulation']['num_generations']
+
+    def get_pheno_params(self):
+        pass 
+
+    def get_brain_params(self):
+        pass 
+
+    def get_simulation_params(self):
+        pass 
+
+    def get_mutation_params(self):
+        pass 
