@@ -1,6 +1,6 @@
 import numpy as np
 
-DEFAULT_OUTPUT_ACTIONS = [
+DEFAULT_OUTPUT_ACTIONS = [    #I will treat this array as a brainstorming section
     'secrete_pheromone',
     'motion_magnitude',   #forward distance travel 1 = 100% of possible motion
     'direction_change',
@@ -15,6 +15,9 @@ DEFAULT_OUTPUT_ACTIONS = [
     'reproduce_asexual',
     'reproduce_sexual'
 ]
+
+def get_num_outputs():
+    return len(OUTPUT_ACTIONS)
 
 def perform_actions(outputs, org, sim_params={}):
     """
@@ -31,11 +34,11 @@ def perform_actions(outputs, org, sim_params={}):
     for idx in idx_outputs:
         val = active_outputs[idx]
         if idx==0:
-            set_skin_color(org, val, color_type='r') 
+            set_skin_color_r(org, val,) 
         elif idx==1:
-            set_skin_color(org, val, color_type='g')   
+            set_skin_color_g(org, val,)   
         elif idx==2:
-            set_skin_color(org, val, color_type='b') 
+            set_skin_color_b(org, val,) 
         elif idx==3:
             set_skin_alpha(org, val)  
         elif idx==4:
@@ -88,8 +91,23 @@ def reproduce_sexual(this_org, other_org):
 def set_oscillator(org, val, max_t_step):
     org.oscillator = int((max_t_step * val))
 
-def set_skin_color(org, val, color_type='r'):
+def NOT_GOOD_set_skin_color(org, val, color_type='r'):
     color_attr = f"skin_color_{color_type}"
+    if hasattr(org, color_attr):
+        setattr(org, color_attr) = int(255*val)
+
+def set_skin_color_r(org, val):
+    color_attr = "skin_color_r"
+    if hasattr(org, color_attr):
+        setattr(org, color_attr) = int(255*val)
+
+def set_skin_color_g(org, val):
+    color_attr = "skin_color_g"
+    if hasattr(org, color_attr):
+        setattr(org, color_attr) = int(255*val)
+
+def set_skin_color_b(org, val):
+    color_attr = "skin_color_b"
     if hasattr(org, color_attr):
         setattr(org, color_attr) = int(255*val)
 
@@ -98,4 +116,9 @@ def set_skin_alpha(org, val):
         org.skin_alpha = val
 
 
-    
+OUTPUT_ACTIONS = [
+    set_skin_color_r,
+    set_skin_color_g,
+    set_skin_color_b,
+    set_skin_alpha,
+]
