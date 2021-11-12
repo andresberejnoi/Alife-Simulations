@@ -8,9 +8,9 @@ class Organism(BaseOrganism):
     def __repr__(self):
         return f"<Org: Genome_len={len(self._genome):>3} | NeuralNet Conns={self.nnet.num_connections:>3}, hidden_neurons={self.nnet.num_hidden:>3}, type={self.type.upper():>10}>"
 
-    def think(self, sensor_funcs={}):
+    def think(self, **sim_params):
         '''Wrapper for nnet.feedforward to make it easier to access'''
-        outputs = self.nnet.feedforward(sensor_funcs)
+        outputs = self.nnet.feedforward(**sim_params)
         return outputs
 
     def move(self, dx, dy):
@@ -24,3 +24,5 @@ class Organism(BaseOrganism):
         self.y_pos += dy
 
         return self.y_pos, self.x_pos
+
+    

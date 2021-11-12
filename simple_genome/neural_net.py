@@ -1,4 +1,5 @@
 import numpy as np
+from input_sensors import read_sensor
 
 class NeuralNet(object):
     def __init__(self, activation_func=np.tanh, num_senses=30, num_outputs=30):
@@ -40,14 +41,12 @@ class NeuralNet(object):
     def num_connections(self):
         return len(self.connections)
 
-    def feedforward(self, sensor_funcs={}):
+    def feedforward(self, **sim_params):
         '''
-        sensory_funcs: dict
-            Dictionary of callables that return a value
-            for a corresponding sensor. Each key is an index
-            from 0 to num_senses and the value is a function
-            that takes standard parameters, as defined by the
-            project description.
+        This function was adapted from David Miller's Github code here: https://github.com/davidrmiller/biosim4/blob/main/src/feedforward.cpp
+        sim_params: dict
+            Wildcard of values that can be passed to the feedforward function.
+            The parameters should be simulation related parameters that would be needed to get the proper sensor readings
         '''
         if not self._container_vectors_exist:
             self.set_up_container_vectors()
@@ -69,8 +68,9 @@ class NeuralNet(object):
             if conn.source_type == 'input':
                 #inputVal = getSensor((Sensor)conn.sourceNum, simStep);  #check what the cpp code does with get sensor. It might be significantly different from what I need
                 #input_val = 0
-                input_func = sensor_funcs.get(conn.source_id, lambda x: np.random.rand())  #if sensor does not exist for some reason, return random value [0,1]
-                input_val = input_func(self)
+                #input_func = sensor_funcs.get(conn.source_id, lambda x: np.random.rand())  #if sensor does not exist for some reason, return random value [0,1]
+                #sensor_func = read_sensor
+                input_val = read_sensor(self, conn.source_id, **sim_params)
             else:
                 input_val = self.neurons[conn.source_id].output
             
