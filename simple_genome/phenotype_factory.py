@@ -5,7 +5,7 @@ from decoders import EmptyDecoder
 class PhenotypeFactory(object):
     def __init__(self,
                  gene_length   = 32,
-                 id_length     = 8,
+                 id_length     = 7,
                  switch_length = 1,
                  gene_decoders = None,):  #5 in 1000
 
@@ -22,9 +22,9 @@ class PhenotypeFactory(object):
         #Create bit masks based on the actual lengths of the gene
         self.FULL_GENE_MASK  = int('1'*self.GENE_LENGTH  , 2)                #0xFFFFFFFF     # Use to only keep the first 32 bits in a number
         self.SWITCH_BIT_MASK = int('1'*self.SWITCH_LENGTH, 2)                #0x00000001     # .... .... .... .... .... .... .... ...1
-        self.HEADER_MASK     = int('1'*self.HEADER_LENGTH, 2)                #0x000001FF     # .... .... .... .... .... ...1 1111 1111
-        self.ID_MASK         = self.HEADER_MASK    & ~self.SWITCH_BIT_MASK   #0x000001FE     # .... .... .... .... .... ...1 1111 1110
-        self.GENE_VALUE_MASK = self.FULL_GENE_MASK & ~self.HEADER_MASK       #0xFFFFFE00     # 1111 1111 1111 1111 1111 111. .... ....
+        self.HEADER_MASK     = int('1'*self.HEADER_LENGTH, 2)                #0x000000FF     # .... .... .... .... .... .... 1111 1111
+        self.ID_MASK         = self.HEADER_MASK    & ~self.SWITCH_BIT_MASK   #0x000000FE     # .... .... .... .... .... .... 1111 1110
+        self.GENE_VALUE_MASK = self.FULL_GENE_MASK & ~self.HEADER_MASK       #0xFFFFFF00     # 1111 1111 1111 1111 1111 1111 .... ....
 
         #Special Marker Genes
         self.NULL_GENE                = int('10'*(self.GENE_LENGTH//2), 2)   #0xAAAAAAAA     # 1010 1010 1010 1010 1010 1010 1010 1010
