@@ -1,5 +1,29 @@
 """Define each sensor with a function"""
 
+def get_sensor(sensor_id):
+    if sensor_id==0:
+        return get_current_x
+    elif sensor_id==1:
+        return get_current_y
+    elif sensor_id==2:
+        return get_last_x
+    elif sensor_id==3:
+        return get_last_y
+    elif sensor_id==4:
+        return get_color_r
+    elif sensor_id==5:
+        return get_color_g
+    elif sensor_id==6:
+        return get_color_b
+    elif sensor_id==7:
+        return get_color_alpha
+
+    #--------Neighbor related sensors
+    elif sensor_id==8:
+        return get_genetic_distance
+    elif sensor_id==9:
+        return get_neihgbor_distance
+    
 
 #-------------LOCATION SENSORS---------------#
 def get_current_x(org):
