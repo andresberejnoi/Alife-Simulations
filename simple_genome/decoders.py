@@ -114,32 +114,39 @@ class PheromoneDecoder(BaseDecoder):
         attrs=[('pheromone_strength',10), ('pheromone_channel',0)]
         return attrs
 
-class SkinColorRedDecoder(BaseDecoder):
-    def __init__(self, gene_id=None, name='skin_color_red'):
+class SkinRGBDecoder(BaseDecoder):
+    def __init__(self, gene_id=None, name='base_decoder'):
         super().__init__(gene_id=gene_id, name=name)
     def decode(self, gene_value):
-        attrs=[('skin_color_r',255)]
-        return attrs
+        if isinstance(gene_value, str):
+            gene_value = int(gene_value, 2)   #in case we get a binary string, convert it back into an int
+        blue_mask  = 0xFF
+        green_mask = blue_mask << 8
+        red_mask   = green_mask << 8
 
-class SkinColorGreenDecoder(BaseDecoder):
-    def __init__(self, gene_id=None, name='skin_color_green'):
-        super().__init__(gene_id=gene_id, name=name)
-    def decode(self, gene_value):
-        attrs=[('skin_color_g',255)]
-        return attrs
+        blue_shift  = 0
+        green_shift = 8
+        red_shift   = 16
 
-class SkinColorBlueDecoder(BaseDecoder):
-    def __init__(self, gene_id=None, name='skin_color_blue'):
-        super().__init__(gene_id=gene_id, name=name)
-    def decode(self, gene_value):
-        attrs=[('skin_color_b',255)]
+        r = (gene_value & red_mask)   >> red_shift
+        g = (gene_value & green_mask) >> green_shift
+        b = (gene_value & blue_mask)  >> blue_shift
+
+        attrs = [
+            ('skin_color_r', r),
+            ('skin_color_g', g),
+            ('skin_color_b', b),
+        ]
         return attrs
 
 class SkinAlphaDecoder(BaseDecoder):
     def __init__(self, gene_id=None, name='skin_alpha'):
         super().__init__(gene_id=gene_id, name=name)
     def decode(self, gene_value):
-        attrs=[('skin_alpha',1.0)]
+        max_val = int('1'*10, 1)    #max possible value on a 24-bit value field (this does not currently check if this bit number is correct. It depends on the Phenotype factory)
+        alpha   = min([(gene_value / max_val), 1])   #this will return 1 at most in case the number happens to be higher 
+
+        attrs=[('skin_alpha', alpha)]
         return attrs
 
 decoder_constructors = [ 
@@ -152,9 +159,7 @@ decoder_constructors = [
     SpeedDecoder,
     GrowthDecoder,
     SizeDecoder,
-    SkinColorRedDecoder,
-    SkinColorGreenDecoder,
-    SkinColorBlueDecoder,
+    SkinRGBDecoder,
     SkinAlphaDecoder,
 ]
 
