@@ -1,6 +1,5 @@
 import yaml
 import numpy as np
-from genome import Genome
 
 def get_settings_from_file(filename=''):
     default_file = 'default_config.yml'
@@ -37,6 +36,15 @@ def make_random_genome(num_genes,
     brain_genes[-1] = end_brain_marker
 
     return list(pheno_genes) + list(brain_genes)
+
+def get_distance(p1=(0,0), p2=(0,0)):
+    '''get discrete distance'''
+    x1, y1 = p1
+    x2, y2 = p2 
+
+    dx = abs(x1 - x2)
+    dy = abs(y1 - y2)
+    return max([dx,dy])
 
 def show_org_info(org):
     print(f"\n{'-'*80}")
