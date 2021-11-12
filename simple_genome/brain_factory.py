@@ -20,7 +20,7 @@ class BrainFactory(object):
                  section_lengths=(1,7,1,7,16),
                  remove_floating_hidden_neurons=False):
 
-        self.max_hidden_neurons =  max_hidden_neurons
+        self.max_hidden_neurons = max_hidden_neurons
         self.num_senses         = num_senses
         self.num_outputs        = num_outputs
         self.remove_floating_hidden_neurons = remove_floating_hidden_neurons
