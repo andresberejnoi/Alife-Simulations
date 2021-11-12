@@ -1,6 +1,6 @@
-from genome import Genome    #It does not look good. I keep importing this into every file. Maybe it should be a basic type
 import numpy as np
 import yaml
+from tools import get_distance
 #==============================================================================================
 # Brain related classes
 class Connection(object):
@@ -63,6 +63,8 @@ class BaseOrganism(object):
 
         self._next_x = x_pos 
         self._next_y = y_pos
+
+        self._direction = np.random.rand()
     
     @property
     def max_x(self):
@@ -173,14 +175,19 @@ class BaseOrganism(object):
     
     @property
     def direction(self):
-        '''this is the angle or direction of last motion'''
-        # x1, y1 = self.last_x, self.last_y
-        # x2, y2 = self.x_pos, self.y_pos
-        # mag    = self.motion_magnitude
-        # _cos_arg = (x2-x1) / mag
-        # direction = np.arccos(_cos_arg)   #inverse cosine: angle = cos^-1((x2-x1)/mag)
-        _, _, _, direction = self.get_last_motion_vector()
-        return direction
+        # '''this is the angle or direction of last motion'''
+        # # x1, y1 = self.last_x, self.last_y
+        # # x2, y2 = self.x_pos, self.y_pos
+        # # mag    = self.motion_magnitude
+        # # _cos_arg = (x2-x1) / mag
+        # # direction = np.arccos(_cos_arg)   #inverse cosine: angle = cos^-1((x2-x1)/mag)
+        # _, _, _, direction = self.get_last_motion_vector()
+        # return direction
+        return self._direction
+    
+    @direction.setter
+    def direction(self, new_val):
+        self._direction = new_val if new_val <=1 else new_val/360   #assume that the angle is either in the range [0-1] or [0-360] (in the latter case, we need to convert it to [0-1])
 
     @property
     def motion_magnitude(self):
@@ -189,7 +196,9 @@ class BaseOrganism(object):
         # x2, y2 = self.x_pos, self.y_pos
 
         # mag = np.sqrt((x2-x1)**2 + (y2-y1)**2)
-        _, _, mag, _ = self.get_last_motion_vector()
+        p1 = self.get_last_pos()
+        p2 = self.get_pos()
+        mag = get_distance(p1, p2)
         return mag
 
     def get_last_motion_vector(self):
@@ -198,12 +207,16 @@ class BaseOrganism(object):
         
         origin    = (x1, y1)
         dest      = (x2, y2)
-        mag       = np.sqrt((x2-x1)**2 + (y2-y1)**2) #vector magnitude
+        #mag       = np.sqrt((x2-x1)**2 + (y2-y1)**2) #vector magnitude (continuous)
+        mag       = get_distance((x1,y1), (x2,y2))
         direction = np.arccos((x2-x1) / mag) 
+
+        print(f"Vector values: origin: (x1={x1},y1={y1}), Dest: (x2={x2},y2={y2}), mag={mag}, direction={direction}")
         #mag       = self.motion_magnitude
         #direction = self.direction
         return (origin, dest, mag, direction)
 
+    #TODO: determine if this function below should be removed for good
     def _TODO_get_distance(self, other_org, mode='discrete'):
         '''Finds distance between this org and other_org'''
         if mode=='discrete':
@@ -241,9 +254,15 @@ class BaseOrganism(object):
         self.x_pos = x_pos
         self.y_pos = y_pos
 
+        if self.get_pos() != self.get_last_pos():
+            self.direction = np.arccos((self.x_pos - self.last_x) / self.motion_magnitude)
+
     def set_pos_boundaries(self, min_x, min_y, max_x, max_y):
         self.max_x, self.max_y = max_x, max_y
         self.min_x, self.min_y = min_y, min_y
+
+    def get_last_pos(self):
+        return self.last_x, self.last_y
 
     def get_pos(self):
         '''returns tuple of (x,y) position (column,row)'''
