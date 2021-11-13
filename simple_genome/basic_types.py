@@ -187,7 +187,7 @@ class BaseOrganism(object):
     
     @direction.setter
     def direction(self, new_val):
-        self._direction = new_val if new_val <=1 else new_val/360   #assume that the angle is either in the range [0-1] or [0-360] (in the latter case, we need to convert it to [0-1])
+        self._direction = new_val   #assume that the angle is either in the range [0-1] or [0-360] (in the latter case, we need to convert it to [0-1])
 
     @property
     def motion_magnitude(self):
