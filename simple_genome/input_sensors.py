@@ -48,6 +48,9 @@ def get_biomass_dir_y(org, **sim_params):
 def get_biomass_density(org, **sim_params):
     pass 
 
+#------------Oscillator
+def get_oscillator(org, **sim_params):
+    return org.oscillator
 
 #-------------NEIGHBOR FUNCTIONS   
 # The dir_x, dir_y, and distance functions should work
@@ -123,8 +126,13 @@ SENSOR_ARRAY = [
     get_color_g,
     get_color_b,
     get_color_alpha,
+    get_oscillator,
+
+    #---Sensors dealing with another organism
     get_genetic_distance,
     get_neihgbor_distance,
     get_neighbor_dir_x,
-    get_neighbor_dir_y
+    get_neighbor_dir_y,
+
+    
 ]
