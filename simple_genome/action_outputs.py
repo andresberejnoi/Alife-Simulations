@@ -19,7 +19,10 @@ DEFAULT_OUTPUT_ACTIONS = [    #I will treat this array as a brainstorming sectio
 def get_num_outputs():
     return len(OUTPUT_ACTIONS)
 
-def perform_actions(outputs, org, sim_params={}):
+def get_action_func_by_id(action_id):
+    return OUTPUT_ACTIONS[action_id]
+
+def perform_actions(outputs, org, **sim_params):
     """
     outputs: numpy array
         Array of outputs from org's neural network
@@ -33,62 +36,25 @@ def perform_actions(outputs, org, sim_params={}):
 
     for idx in idx_outputs:
         val = active_outputs[idx]
-        if idx==0:
-            set_skin_color_r(org, val,) 
-        elif idx==1:
-            set_skin_color_g(org, val,)   
-        elif idx==2:
-            set_skin_color_b(org, val,) 
-        elif idx==3:
-            set_skin_alpha(org, val)  
-        elif idx==4:
-            set_oscillator(org, val, max_t_step=sim_params.get('steps_per_generation', 100))  
-        elif idx==5:
-            pass 
-        elif idx==6:
-            pass 
-        elif idx==7:
-            pass 
-        elif idx==8:
-            pass 
-        elif idx==9:
-            pass 
-        elif idx==10:
-            pass 
-        elif idx==11:
-            pass 
-        elif idx==12:
-            pass 
-        elif idx==13:
-            pass 
-        elif idx==14:
-            pass 
-        elif idx==15:
-            pass 
-        elif idx==16:
-            pass 
-        elif idx==17:
-            pass 
-        elif idx==18:
-            pass 
-        elif idx==19:
-            pass 
-        elif idx==20:
-            pass 
+        action_func = get_action_func_by_id(idx)
+        
+        #----Perform the action 
+        action_func(org, val, **sim_params)
 
 
 
-def secrete_pheromone(org, world, val):
+def secrete_pheromone(org, val, **sim_params):
     pass 
 
-def reproduce_asexual(org):
+def reproduce_asexual(org, val, **sim_params):
     child_org = None 
     return child_org
 
-def reproduce_sexual(this_org, other_org):
+def reproduce_sexual(org, val, **sim_params):
     pass 
 
-def set_oscillator(org, val, max_t_step):
+def set_oscillator(org, val, **sim_params):
+    max_t_step = sim_params.get('steps_per_generation')
     org.oscillator = int((max_t_step * val))
 
 def NOT_GOOD_set_skin_color(org, val, color_type='r'):
@@ -121,4 +87,5 @@ OUTPUT_ACTIONS = [
     set_skin_color_g,
     set_skin_color_b,
     set_skin_alpha,
+    set_oscillator,
 ]
