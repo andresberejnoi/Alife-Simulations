@@ -136,6 +136,7 @@ class SkinRGBDecoder(BaseDecoder):
             ('skin_color_r', r),
             ('skin_color_g', g),
             ('skin_color_b', b),
+            ('temp_rgb'    , [r,g,b])
         ]
         return attrs
 
