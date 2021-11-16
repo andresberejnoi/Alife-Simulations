@@ -55,6 +55,7 @@ def show_org_info(org):
     print(f"\n* Connections ({len(org.nnet.connections)}):\n\t{new_line.join([str(conn) for conn in org.nnet.connections])}") 
     print(f"\n* Neuron Accumulators:\n\t{org.nnet.neuron_accumulators}" )
     print(f"\n* Neuron Output Vector:\n\t{org.nnet.output_vector}")
+    print(f"\n* Active Output Indexes:\n\t{org.nnet.active_outputs_idx}")
     #f"\n* Org Genome:\n\t{new_line.join([bin(gene) for gene in org.genome])}" )
     
     print("\nGenome (Readable):\n")
