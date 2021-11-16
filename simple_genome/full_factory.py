@@ -4,7 +4,9 @@ from phenotype_factory import PhenotypeFactory
 from genome import Genome 
 from basic_types import MutationChange
 from tools import get_settings_from_file
-import numpy as np 
+import numpy as np
+from input_sensors import get_num_senses
+from action_outputs import get_num_outputs 
 
 
 def make_factory_from_config(config_filename=None, decoders={}):
@@ -12,8 +14,8 @@ def make_factory_from_config(config_filename=None, decoders={}):
 
     num_genes       = config['simulation']['num_pheno_genes']
     num_brain_conns = config['simulation']['num_brain_conns']
-    num_senses      = 20
-    num_outputs     = 20
+    num_senses      = get_num_senses()
+    num_outputs     = get_num_outputs()
 
     gene_length           = config['phenotype_genome']['gene_length']
     mutation_rate         = config['mutation']['point_mutation_rate']
