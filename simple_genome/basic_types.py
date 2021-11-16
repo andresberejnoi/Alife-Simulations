@@ -65,7 +65,13 @@ class BaseOrganism(object):
         self._next_y = y_pos
 
         self._direction = np.random.rand()
-    
+
+        #Base Properties (not encoded, so kind of cheating)
+        self.skin_color_r = 0
+        self.skin_color_g = 255
+        self.skin_color_b = 0
+        self.skin_alpha   = 1
+
     @property
     def max_x(self):
         return self._max_x
