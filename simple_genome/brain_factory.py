@@ -332,7 +332,7 @@ class BrainFactory(object):
 
         #----Setup container vectors for the network to use during backpropagation
         nnet.set_up_container_vectors()
-        nnet.set_active_outputs()
+        nnet.set_active_outputs_idx()
         return nnet
 
 

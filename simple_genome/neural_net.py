@@ -10,6 +10,7 @@ class NeuralNet(object):
 
         self.num_senses  = num_senses
         self.num_outputs = num_outputs
+        self.active_outputs_idx = []
 
         #-----Create the accumulators and output vectors here 
         # so that they are not created once on every feedforward computation
@@ -26,12 +27,12 @@ class NeuralNet(object):
 
         self._container_vectors_exist = True
 
-    def set_active_outputs(self):
-        self.active_outputs = []
+    def set_active_outputs_idx(self):
+        self.active_outputs_idx.clear()
         for conn in self.connections:
             if conn.target_type=='output':
-                if conn.target_id not in self.active_outputs:
-                    self.active_outputs.append(conn.target_id)
+                if conn.target_id not in self.active_outputs_idx:
+                    self.active_outputs_idx.append(conn.target_id)
 
     @property 
     def num_hidden(self):
