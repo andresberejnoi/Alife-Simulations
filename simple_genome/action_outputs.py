@@ -57,11 +57,6 @@ def set_oscillator(org, val, **sim_params):
     max_t_step = sim_params.get('steps_per_generation')
     org.oscillator = int((max_t_step * val))
 
-def NOT_GOOD_set_skin_color(org, val, color_type='r'):
-    color_attr = f"skin_color_{color_type}"
-    if hasattr(org, color_attr):
-        setattr(org, color_attr) = int(255*val)
-
 def set_skin_color_r(org, val):
     color_attr = "skin_color_r"
     if hasattr(org, color_attr):
