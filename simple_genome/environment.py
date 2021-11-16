@@ -1,5 +1,5 @@
 from action_outputs import perform_actions
-from tools import make_random_genome, show_org_info
+from tools import make_random_genome, show_org_info, get_distance
 import numpy as np
 
 #---Set up RGB Colors
@@ -231,6 +231,9 @@ class Simulation(object):
 
     def advance_simulation(self):
         '''Computes all the changes for the next cycle'''
+        motion_queue = {}
+        kill_queue   = []    #stores the indexes of orgs to be killed from self.population
+        #print(f"\n{'='*80}\n Step: {self.cur_t_step}, Gen: {self.cur_gen}")
         for i, org in enumerate(self.population):
             #TODO: get sensor readings from org
             #TODO: perform feedforward propagation of org's neural net
@@ -243,16 +246,24 @@ class Simulation(object):
             #remaining_orgs = self.population[:i] + self.population[i+1:]
             collisions     = self.detect_collisions(org, i)
             first_neighbor = collisions[0] if len(collisions) > 0 else org    #get first colliding organism if one is available. If not, choose itself
+            
+            motion_queue[i] = [0, 0]
             sim_params     = {  #package all necessary information in this dictionary so it can be passed to the underlying methods
                 'this_org'     : org,
+                'this_idx'     : i,
                 'neighbor_org' : first_neighbor,
                 'steps_per_generation' : self.steps_per_generation,
+                'motion_queue' : motion_queue,  #key -> org index, val -> list[Motion magnitude, direction change]
+                'kill_queue'   : kill_queue,
             }
 
             #TODO: 
             try:
+                
                 actions = org.think(**sim_params)   #make organism think
+                #print(f"\n{'-'*80}\n* Actions before performing them:\n{actions}")
                 perform_actions(actions, org, **sim_params)
+                #print(f"\n* Actions After performing them:\n{actions}")
             except IndexError as e:
                 #print(f"\n{'-'*80}\n{e}")
                 print(f"-> Error at generation={self.cur_gen}, timestep={self.cur_t_step}")
@@ -261,6 +272,10 @@ class Simulation(object):
                 print("\n-> Exiting in shame...")
                 import sys
                 sys.exit()  
+            except OverflowError as e:
+                print(f"actions: {actions}")
+                import sys
+                sys.exit()
 
     def _advance_simulation(self):
         for i, org in enumerate(self.population):
@@ -271,14 +286,30 @@ class Simulation(object):
             
     def detect_collisions(self, org, org_idx):
         collisions = []
+        this_pos  = org.get_pos()   #-> (x,y) tuple
+        # radius = 1
+        # bbox = [this_pos[0]-radius,   #x - radius
+        #         this_pos[0]+radius,   #x + radius
+        #         this_pos[1]-radius,   #y - radius
+        #         this_pos[1]+radius,   #y + radius
+        # ]
+
         for other in self.population[org_idx+1:]:
             #this_x, this_y   = org.get_pos()
             #other_x, other_y = other.get_pos()
-            this_pos  = org.get_pos()   #-> (x,y) tuple
             other_pos = other.get_pos() #-> (x,y) tuple
 
-            if this_pos==other_pos:
+            #---Filter any orgs that are too far to matter
+            # if (other_pos[0] < bbox[0]) or (other_pos[0] > bbox[1]) \
+            #     or (other_pos[1] < bbox[2]) or (other_pos[1] > bbox[3]):
+            #     continue  
+
+            # if this_pos==other_pos:
+            #     collisions.append(other)
+            
+            if get_distance(this_pos, other_pos) <= 1:
                 collisions.append(other)
+
         return collisions
     
     #TODO: explore this idea of using a numpy 2D matrix to store the organisms directly.
