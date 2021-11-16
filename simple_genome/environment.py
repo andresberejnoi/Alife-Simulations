@@ -1,3 +1,4 @@
+from action_outputs import perform_actions
 from tools import make_random_genome, show_org_info
 import numpy as np
 
@@ -252,6 +253,7 @@ class Simulation(object):
             #TODO: 
             try:
                 actions = org.think(**sim_params)   #make organism think
+                perform_actions(actions, org, **sim_params)
             except IndexError as e:
                 #print(f"\n{'-'*80}\n{e}")
                 print(f"-> Error at generation={self.cur_gen}, timestep={self.cur_t_step}")
