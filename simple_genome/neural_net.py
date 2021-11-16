@@ -33,6 +33,7 @@ class NeuralNet(object):
             if conn.target_type=='output':
                 if conn.target_id not in self.active_outputs_idx:
                     self.active_outputs_idx.append(conn.target_id)
+        self.active_outputs_idx.sort()
 
     @property 
     def num_hidden(self):
