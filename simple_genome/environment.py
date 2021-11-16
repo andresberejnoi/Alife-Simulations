@@ -243,7 +243,7 @@ class Simulation(object):
             #remaining_orgs = self.population[:i] + self.population[i+1:]
             collisions     = self.detect_collisions(org, i)
             first_neighbor = collisions[0] if len(collisions) > 0 else org    #get first colliding organism if one is available. If not, choose itself
-            sim_params     = {
+            sim_params     = {  #package all necessary information in this dictionary so it can be passed to the underlying methods
                 'this_org'     : org,
                 'neighbor_org' : first_neighbor,
                 'steps_per_generation' : self.steps_per_generation,
@@ -251,7 +251,7 @@ class Simulation(object):
 
             #TODO: 
             try:
-                actions = org.think()   #make organism think
+                actions = org.think(**sim_params)   #make organism think
             except IndexError as e:
                 #print(f"\n{'-'*80}\n{e}")
                 print(f"-> Error at generation={self.cur_gen}, timestep={self.cur_t_step}")
