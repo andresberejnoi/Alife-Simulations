@@ -35,7 +35,7 @@ def perform_actions(outputs, org, **sim_params):
     idx_outputs = nnet.active_outputs_idx   #get index of the active outputs
 
     #active_outputs = outputs[idx_outputs]  #this assumes outputs is a numpy array
-
+    probability_outputs = (np.tanh(outputs) + 1) / 2  #+1 shifts values to [0-2] and the /2 reduces the value in the range [0-1] so it can be used as a probability
     for idx in idx_outputs:
         val = outputs[idx]
         action_func = get_action_func_by_id(idx)
