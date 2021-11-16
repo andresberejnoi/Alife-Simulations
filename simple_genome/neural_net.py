@@ -45,7 +45,7 @@ class NeuralNet(object):
 
     def feedforward(self, **sim_params):
         '''
-        This function was adapted from David Miller's Github code here: https://github.com/davidrmiller/biosim4/blob/main/src/feedforward.cpp
+        This function was adapted from David Miller's Github code here: https://github.com/davidrmiller/biosim4/blob/main/src/feedForward.cpp
         sim_params: dict
             Wildcard of values that can be passed to the feedforward function.
             The parameters should be simulation related parameters that would be needed to get the proper sensor readings
