@@ -2,6 +2,16 @@ from action_outputs import perform_actions
 from tools import make_random_genome, show_org_info
 import numpy as np
 
+#---Set up RGB Colors
+GREEN  = (0  , 255,   0)
+RED    = (255,   0,   0)
+BLUE   = (0  ,   0, 255)
+YELLOW = (255, 255,  50)
+BLACK  = (0  ,   0,   0)
+WHITE  = (255, 255, 255)
+PURPLE = (150,  50, 255)
+BROWN  = (150, 130, 130)
+
 class World(object):
     BARRIER    = 100
     WATER      = 20
@@ -12,9 +22,6 @@ class World(object):
     CARNIVORE  = 3
     OMNIVORE   = 4
 
-    
-
-
     OBJECT_TYPES = {
         'water'      : WATER,
         'world_edge' : WORLD_EGDE,
@@ -24,6 +31,18 @@ class World(object):
         'herbivore'  : HERBIVORE,
         'carnivore'  : CARNIVORE,
         'omnivore'   : OMNIVORE,
+    }
+
+    color_dict = {
+        WORLD_EGDE : BLACK,
+        BARRIER    : BROWN,
+        EMPTY      : WHITE,
+        PLANT      : GREEN,
+        HERBIVORE  : YELLOW,
+        CARNIVORE  : RED,
+        OMNIVORE   : PURPLE,
+        WATER      : BLUE
+
     }
 
     def __init__(self, width=1000, height=1000, padding_thickness = 10):
@@ -114,26 +133,8 @@ class World(object):
 
     def get_rgb_img(self):
         '''I'm sleep deprived, so this function might not be very efficient'''
-        #---Set up RGB Colors
-        GREEN  = (0  , 255,   0)
-        RED    = (255,   0,   0)
-        BLUE   = (0  ,   0, 255)
-        YELLOW = (255, 255,  50)
-        BLACK  = (0  ,   0,   0)
-        WHITE  = (255, 255, 255)
-        PURPLE = (150,  50, 255)
-        BROWN  = (150, 130, 130)
-        color_dict = {
-            self.WORLD_EGDE : BLACK,
-            self.BARRIER    : BROWN,
-            self.EMPTY      : WHITE,
-            self.PLANT      : GREEN,
-            self.HERBIVORE  : YELLOW,
-            self.CARNIVORE  : RED,
-            self.OMNIVORE   : PURPLE,
-            self.WATER      : BLUE
-
-        }
+        
+        
         if len(self.grid.shape) < 3:
             rgb_grid = np.repeat(self.grid[..., np.newaxis], 3, axis=2)
         
@@ -159,19 +160,17 @@ class World(object):
         empty_mask     = np.all(rgb_grid==empty_3d,     axis=2)
 
         #----Apply the masks on the rgb array
-        rgb_grid[edge_mask,      :] = color_dict[self.WORLD_EGDE]
-        rgb_grid[plant_mask,     :] = color_dict[self.PLANT]
-        rgb_grid[herbivore_mask, :] = color_dict[self.HERBIVORE]
-        rgb_grid[carnivore_mask, :] = color_dict[self.CARNIVORE]
-        rgb_grid[omnivore_mask,  :] = color_dict[self.OMNIVORE]
-        rgb_grid[empty_mask,     :] = color_dict[self.EMPTY]
+        rgb_grid[edge_mask,      :] = self.color_dict[self.WORLD_EGDE]
+        rgb_grid[plant_mask,     :] = self.color_dict[self.PLANT]
+        rgb_grid[herbivore_mask, :] = self.color_dict[self.HERBIVORE]
+        rgb_grid[carnivore_mask, :] = self.color_dict[self.CARNIVORE]
+        rgb_grid[omnivore_mask,  :] = self.color_dict[self.OMNIVORE]
+        rgb_grid[empty_mask,     :] = self.color_dict[self.EMPTY]
         return rgb_grid
 
     @property
     def shape(self):
         return (self.height, self.width)
-
-    
 
 class Simulation(object):
     def __init__(self, 
