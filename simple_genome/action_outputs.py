@@ -32,10 +32,10 @@ def perform_actions(outputs, org, **sim_params):
     nnet = org.nnet
     idx_outputs = nnet.active_outputs_idx   #get index of the active outputs
 
-    active_outputs = outputs[idx_outputs]  #this assumes outputs is a numpy array
+    #active_outputs = outputs[idx_outputs]  #this assumes outputs is a numpy array
 
     for idx in idx_outputs:
-        val = active_outputs[idx]
+        val = outputs[idx]
         action_func = get_action_func_by_id(idx)
         
         #----Perform the action 
