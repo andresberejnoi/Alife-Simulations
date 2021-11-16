@@ -53,7 +53,8 @@ def show_org_info(org):
     print(f"\n* Neural net:\n{org.nnet}") 
     print(f"\n* Neurons ({len(org.nnet.neurons)}):\n\t{new_line.join([str(neuron) for neuron in org.nnet.neurons])}")
     print(f"\n* Connections ({len(org.nnet.connections)}):\n\t{new_line.join([str(conn) for conn in org.nnet.connections])}") 
-    print(f"\n* Neuron Accumulator:\n\t{org.nnet.neuron_accumulators}" )
+    print(f"\n* Neuron Accumulators:\n\t{org.nnet.neuron_accumulators}" )
+    print(f"\n* Neuron Output Vector:\n\t{org.nnet.output_vector}")
     #f"\n* Org Genome:\n\t{new_line.join([bin(gene) for gene in org.genome])}" )
     
     print("\nGenome (Readable):\n")
