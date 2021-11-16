@@ -94,7 +94,6 @@ class World(object):
 
         return selected_spots
 
-
     def set_spot(self, x, y, object_type='plant'):
         if isinstance(object_type, int):
             val = object_type
@@ -193,6 +192,7 @@ class Simulation(object):
 
         self.num_gens        = num_generations
         self.spg             = steps_per_generation   #I could make this name more explicit
+        self.steps_per_generation = steps_per_generation
 
     def start(self):
         #----Initialize Population based on parameters
@@ -200,7 +200,7 @@ class Simulation(object):
         for gen in range(self.num_gens):
             self.cur_gen = gen  #there might be a more elegant way to keep global track of the timestep and generation number
             print(f"Starting Generation {gen}") if gen % 1 == 0 else None
-            for t_step in range(self.spg):
+            for t_step in range(self.steps_per_generation):
                 self.cur_t_step = t_step
                 print(f"timestep: {t_step} of generation: {gen}") if t_step % 10 == 0 else None
                 self.advance_simulation()
@@ -241,13 +241,19 @@ class Simulation(object):
 
             #TODO: first detect collisions with every other organism and the environment (create a list of changes to params)
             #remaining_orgs = self.population[:i] + self.population[i+1:]
-            collisions = self.detect_collisions(org, i)
+            collisions     = self.detect_collisions(org, i)
+            first_neighbor = collisions[0] if len(collisions) > 0 else org    #get first colliding organism if one is available. If not, choose itself
+            sim_params     = {
+                'this_org'     : org,
+                'neighbor_org' : first_neighbor,
+                'steps_per_generation' : self.steps_per_generation,
+            }
 
             #TODO: 
             try:
                 actions = org.think()   #make organism think
             except IndexError as e:
-                print(f"\n{'-'*80}\n{e}")
+                #print(f"\n{'-'*80}\n{e}")
                 print(f"-> Error at generation={self.cur_gen}, timestep={self.cur_t_step}")
                 print(f"\n* Index Error (org idx={i}) was caused by Org:\n{org}")
                 show_org_info(org)
@@ -262,7 +268,7 @@ class Simulation(object):
             #allow organism to think, based on sensor data
 
             
-    def _detect_collisions(self, org, org_idx):
+    def detect_collisions(self, org, org_idx):
         collisions = []
         for other in self.population[org_idx+1:]:
             #this_x, this_y   = org.get_pos()
@@ -274,7 +280,8 @@ class Simulation(object):
                 collisions.append(other)
         return collisions
     
-    def detect_collisions(self, org, org_idx):
+    #TODO: explore this idea of using a numpy 2D matrix to store the organisms directly.
+    def _detect_collisions(self, org, org_idx):
         x, y   = org.get_pos()
         radius = 1
         local_grid = self.world.get_surroundings(x, y, radius)
