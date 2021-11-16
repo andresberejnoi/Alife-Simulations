@@ -71,6 +71,7 @@ class BaseOrganism(object):
         self.skin_color_g = 255
         self.skin_color_b = 0
         self.skin_alpha   = 1
+        self.oscillator   = 20
 
     @property
     def max_x(self):
