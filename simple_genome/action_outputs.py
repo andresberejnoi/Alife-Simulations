@@ -25,7 +25,9 @@ def get_action_func_by_id(action_id):
 def perform_actions(outputs, org, **sim_params):
     """
     outputs: numpy array
-        Array of outputs from org's neural network
+        Array of outputs from org's neural network. Values in `outputs`
+        can be of any range, so this function will standardize them into a 
+        range of 0 to 1 by using a hyperbolic tangent and some divisions.
     org: Organism
         The Organism object that produced the output array
     """
@@ -55,27 +57,45 @@ def reproduce_sexual(org, val, **sim_params):
 
 def set_oscillator(org, val, **sim_params):
     max_t_step = sim_params.get('steps_per_generation')
-    org.oscillator = int((max_t_step * val))
+    #org.oscillator = int((max_t_step * val))
+    org.oscillator = min([int(max_t_step*val), max_t_step])
 
 def set_skin_color_r(org, val, **sim_params):     
     color_attr = "skin_color_r"
     if hasattr(org, color_attr):
-        setattr(org, color_attr, int(255*val))
+        new_color = min([int(255*val), 255])
+        setattr(org, color_attr, new_color)
 
 def set_skin_color_g(org, val, **sim_params):
     color_attr = "skin_color_g"
     if hasattr(org, color_attr):
-        setattr(org, color_attr, int(255*val))
+        new_color = min([int(255*val), 255])
+        setattr(org, color_attr, new_color)
 
 def set_skin_color_b(org, val, **sim_params):
     color_attr = "skin_color_b"
     if hasattr(org, color_attr):
-        setattr(org, color_attr, int(255*val))
+        new_color = min([int(255*val), 255])
+        setattr(org, color_attr, new_color)
 
 def set_skin_alpha(org, val, **sim_params):
     attr_name = 'skin_alpha'
     if hasattr(org, attr_name):
         setattr(org, attr_name, val)
+
+#--------MOTION ACTIONS
+def change_direction(org, val, **sim_params):
+    attr = 'direction'
+    if hasattr(org, attr):
+        #setattr(org, attr, val)
+        original_dir = getattr(org, 'direction')
+        sim_params['motion_queue'][1] = original_dir + val
+
+def move_by_amount(org, val, **sim_params):
+    origin = org.get_pos()
+    
+
+    
 
 
 OUTPUT_ACTIONS = [
@@ -84,4 +104,6 @@ OUTPUT_ACTIONS = [
     set_skin_color_b,
     set_skin_alpha,
     set_oscillator,
+    change_direction,
+    move_by_amount,
 ]
