@@ -70,7 +70,7 @@ class NeuralNet(object):
                 #input_val = 0
                 #input_func = sensor_funcs.get(conn.source_id, lambda x: np.random.rand())  #if sensor does not exist for some reason, return random value [0,1]
                 #sensor_func = read_sensor
-                input_val = read_sensor(self, conn.source_id, **sim_params)
+                input_val = read_sensor(conn.source_id, **sim_params)
             else:
                 input_val = self.neurons[conn.source_id].output
             
