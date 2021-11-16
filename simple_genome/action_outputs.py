@@ -57,22 +57,22 @@ def set_oscillator(org, val, **sim_params):
     max_t_step = sim_params.get('steps_per_generation')
     org.oscillator = int((max_t_step * val))
 
-def set_skin_color_r(org, val):     
+def set_skin_color_r(org, val, **sim_params):     
     color_attr = "skin_color_r"
     if hasattr(org, color_attr):
         setattr(org, color_attr, int(255*val))
 
-def set_skin_color_g(org, val):
+def set_skin_color_g(org, val, **sim_params):
     color_attr = "skin_color_g"
     if hasattr(org, color_attr):
         setattr(org, color_attr, int(255*val))
 
-def set_skin_color_b(org, val):
+def set_skin_color_b(org, val, **sim_params):
     color_attr = "skin_color_b"
     if hasattr(org, color_attr):
         setattr(org, color_attr, int(255*val))
 
-def set_skin_alpha(org, val):
+def set_skin_alpha(org, val, **sim_params):
     attr_name = 'skin_alpha'
     if hasattr(org, attr_name):
         setattr(org, attr_name, val)
