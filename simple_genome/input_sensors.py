@@ -11,6 +11,7 @@ def get_num_senses():
 def read_sensor(org, input_id, **sim_params):
     sensor = get_sensor(input_id)
     val = sensor(org, **sim_params)
+    return val
 
 #-------------LOCATION SENSORS---------------#
 def get_current_x(org, **sim_params):
@@ -58,59 +59,59 @@ def get_oscillator(org, **sim_params):
 # magnitude towards the closest neighbor
 #        
 def get_genetic_distance(org, **sim_params):
-    closest_org = sim_params.get('closest_org')
+    closest_org = sim_params.get('neighbor_org')
     if org == closest_org:
         return 0
 
 def get_neighbor_direction(org, **sim_params):
-    closest_org = sim_params.get('closest_org')
+    closest_org = sim_params.get('neighbor_org')
     if org == closest_org:
         return org.direction
 
 def get_neighbor_dir_x(org, **sim_params):
-    closest_org = sim_params.get('closest_org')
+    closest_org = sim_params.get('neighbor_org')
     if org == closest_org:
         return 0
      
 
 def get_neighbor_dir_y(org, **sim_params):
-    closest_org = sim_params.get('closest_org')
+    closest_org = sim_params.get('neighbor_org')
     if org == closest_org:
         return 0
      
 
 def get_neihgbor_distance(org, **sim_params):
-    closest_org = sim_params.get('closest_org')
+    closest_org = sim_params.get('neighbor_org')
     if org == closest_org:
         return 0
      
 
 def get_neighbor_age(org, **sim_params):
-    closest_org = sim_params.get('closest_org')
+    closest_org = sim_params.get('neighbor_org')
     if org == closest_org:
         return 0
      
 
 def get_neighbor_color_r(org, **sim_params):
-    closest_org = sim_params.get('closest_org')
+    closest_org = sim_params.get('neighbor_org')
     if org == closest_org:
         return 0
      
 
 def get_neighbor_color_g(org, **sim_params):
-    closest_org = sim_params.get('closest_org')
+    closest_org = sim_params.get('neighbor_org')
     if org == closest_org:
         return 0
      
 
 def get_neighbor_color_b(org, **sim_params):
-    closest_org = sim_params.get('closest_org')
+    closest_org = sim_params.get('neighbor_org')
     if org == closest_org:
         return 0
      
 
 def get_neihgbor_defense(org, **sim_params):
-    closest_org = sim_params.get('closest_org')
+    closest_org = sim_params.get('neighbor_org')
     if org == closest_org:
         return 0
      
