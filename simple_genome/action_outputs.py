@@ -61,22 +61,28 @@ def set_oscillator(org, val, **sim_params):
     org.oscillator = min([int(max_t_step*val), max_t_step])
 
 def set_skin_color_r(org, val, **sim_params):     
-    color_attr = "skin_color_r"
+    color_attr = "temp_rgb"
     if hasattr(org, color_attr):
-        new_color = min([int(255*val), 255])
-        setattr(org, color_attr, new_color)
+        temp_rgb   = getattr(org, color_attr)
+        new_channel  = min([int(255*val), 255])
+        temp_rgb[0] = new_channel 
+        setattr(org, color_attr, temp_rgb)
 
 def set_skin_color_g(org, val, **sim_params):
-    color_attr = "skin_color_g"
+    color_attr = "temp_rgb"
     if hasattr(org, color_attr):
-        new_color = min([int(255*val), 255])
-        setattr(org, color_attr, new_color)
+        temp_rgb   = getattr(org, color_attr)
+        new_channel  = min([int(255*val), 255])
+        temp_rgb[1] = new_channel 
+        setattr(org, color_attr, temp_rgb)
 
 def set_skin_color_b(org, val, **sim_params):
-    color_attr = "skin_color_b"
+    color_attr = "temp_rgb"
     if hasattr(org, color_attr):
-        new_color = min([int(255*val), 255])
-        setattr(org, color_attr, new_color)
+        temp_rgb   = getattr(org, color_attr)
+        new_channel  = min([int(255*val), 255])
+        temp_rgb[2] = new_channel 
+        setattr(org, color_attr, temp_rgb)
 
 def set_skin_alpha(org, val, **sim_params):
     attr_name = 'skin_alpha'
@@ -89,10 +95,32 @@ def change_direction(org, val, **sim_params):
     if hasattr(org, attr):
         #setattr(org, attr, val)
         original_dir = getattr(org, 'direction')
-        sim_params['motion_queue'][1] = original_dir + val
+        val = val * (2*np.pi)  #val will be the amount of angle to rotate (in radians) from current angle
+        org_idx = sim_params.get('this_idx')
+        
+        try:
+            motion_vec = sim_params['motion_queue'][org_idx]
+        except KeyError:
+            motion_vec = [0,0]
+            sim_params['motion_queue'][org_idx] = motion_vec
+
+        motion_vec[1] = val
+        
 
 def move_by_amount(org, val, **sim_params):
-    origin = org.get_pos()
+    '''val here represents the strength of motion.
+    '''
+    #origin = org.get_pos()
+    org_idx = sim_params['this_idx']
+
+    try:
+        motion_vec = sim_params['motion_queue'][org_idx]
+    except KeyError:
+        motion_vec = [0,0]
+        sim_params['motion_queue'][org_idx] = motion_vec
+
+    motion_vec[0] = 0 if val < 0.5 else 1   #TODO: this line needs to be modified when organisms are able to move more than 1 square
+    #sim_params['motion_queue'][0] = 1
     
 
     
