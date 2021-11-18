@@ -71,9 +71,14 @@ class BaseOrganism(object):
         self.skin_color_g = 255
         self.skin_color_b = 0
 
-        self.temp_rgb = [0,255,0]
+        self.temp_rgb = [0,255,0]  #I will think of a way to incorporate this into the program
         self.skin_alpha   = 1
         self.oscillator   = 20
+
+    def reset_color(self):
+        self.temp_rgb[0] = self.skin_color_r
+        self.temp_rgb[1] = self.skin_color_g
+        self.temp_rgb[2] = self.skin_color_b
 
     @property
     def max_x(self):
@@ -137,10 +142,10 @@ class BaseOrganism(object):
     def x_pos(self, new_val):
         #new_val = new_val % self._max_x
         new_val = int(new_val)
-        if new_val > self._max_x:
-            new_val = self._min_x + (new_val % self._max_x)
-        elif new_val < self._min_x:
-            new_val = self._max_x + (new_val % self._min_x)
+        # if new_val > self._max_x:
+        #     new_val = self._min_x + (new_val % self._max_x)
+        # elif new_val < self._min_x:
+        #     new_val = self._max_x + (new_val % self._min_x)
         self._last_x = self._x_pos
         self._x_pos = new_val
     
@@ -152,10 +157,10 @@ class BaseOrganism(object):
     @y_pos.setter
     def y_pos(self, new_val):
         new_val = int(new_val)
-        if new_val > self._max_y:
-            new_val = self._min_y + (new_val % self._max_y)
-        elif new_val < self._min_y:
-            new_val = self._max_y + (new_val % self._min_y)
+        # if new_val > self._max_y:
+        #     new_val = self._min_y + (new_val % self._max_y)
+        # elif new_val < self._min_y:
+        #     new_val = self._max_y + (new_val % self._min_y)
         self._last_y = self._y_pos
         self._y_pos = new_val
 
@@ -197,7 +202,7 @@ class BaseOrganism(object):
     @direction.setter
     def direction(self, new_val):
         self._direction = new_val   #assume that the angle is either in the range [0-1] or [0-360] (in the latter case, we need to convert it to [0-1])
-
+        self._direction = new_val % (2*np.pi)
     @property
     def motion_magnitude(self):
         '''Use pythagoream theorem to find magnitude of motion vector from last motion'''
