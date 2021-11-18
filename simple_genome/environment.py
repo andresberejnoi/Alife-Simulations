@@ -235,6 +235,7 @@ class Simulation(object):
         kill_queue   = []    #stores the indexes of orgs to be killed from self.population
         #print(f"\n{'='*80}\n Step: {self.cur_t_step}, Gen: {self.cur_gen}")
         for i, org in enumerate(self.population):
+            org.reset_color()
             #TODO: get sensor readings from org
             #TODO: perform feedforward propagation of org's neural net
             #TODO: Use output from neural net to perform actions (motions and changes to the environment will be queued to the end of the timestep)
@@ -247,7 +248,7 @@ class Simulation(object):
             collisions     = self.detect_collisions(org, i)
             first_neighbor = collisions[0] if len(collisions) > 0 else org    #get first colliding organism if one is available. If not, choose itself
             
-            motion_queue[i] = [0, 0]
+            #motion_queue[i] = [0, 0]
             sim_params     = {  #package all necessary information in this dictionary so it can be passed to the underlying methods
                 'this_org'     : org,
                 'this_idx'     : i,
@@ -276,6 +277,15 @@ class Simulation(object):
                 print(f"actions: {actions}")
                 import sys
                 sys.exit()
+
+            #-----------------------
+            #update the population
+            for org_idx in motion_queue:
+                motion_strength, delta_direction = motion_queue[org_idx]
+                self.population[org_idx].move_forward(motion_strength, delta_direction) 
+
+            for org_idx in kill_queue:
+                del self.population[org_idx]
 
     def _advance_simulation(self):
         for i, org in enumerate(self.population):
