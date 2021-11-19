@@ -2,6 +2,16 @@ from basic_types import BaseOrganism
 import numpy as np
 
 class Organism(BaseOrganism):
+    POSSIBLE_MOVES = {
+        0: (1,0),
+        1: (1,1),
+        2: (0,1),
+        3: (-1,1),
+        4: (-1,0),
+        5: (-1,-1),
+        6: (0,-1),
+        7: (1,-1),
+    }
     def __init__(self, x_pos=0, y_pos=0, max_x=100, max_y=100, min_x=0, min_y=0):
         super().__init__(x_pos=x_pos, y_pos=y_pos, max_x=max_x, max_y=max_y, min_x=min_x, min_y=min_y)
 
@@ -28,16 +38,7 @@ class Organism(BaseOrganism):
     def move_forward(self, movement_strength, delta_angle):
         '''This function needs to be completed. Right now it makes the 
         assumption that motion is always 1 square away'''
-        possible_moves = {
-            0: (1,0),
-            1: (1,1),
-            2: (0,1),
-            3: (-1,1),
-            4: (-1,0),
-            5: (-1,-1),
-            6: (0,-1),
-            7: (1,-1),
-        }
+        
         #cur_pos = self.get_pos()
         #speed   = getattr(self, 'max_speed', 1)  #call the max speed attribute (it should exist in decoder). It is the number of cells the org can move in a single motion. Defaults to 1 if max_speed is not coded for in genome
 
@@ -52,7 +53,7 @@ class Organism(BaseOrganism):
             base_pi = np.pi/4    #pi/4 will result in 8 sections of the circle around current position. It is good for when motion is only 1 square away
 
             discrete_square = int(new_direction / base_pi) % 8    #will result in a discrete square corresponding to an adjacent square to current position. % 8 assures we only get a value in range [0-7]
-            dx, dy = possible_moves[discrete_square]
+            dx, dy = self.POSSIBLE_MOVES[discrete_square]
 
             self.update_pos(dx, dy)
              
